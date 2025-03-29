@@ -3,7 +3,6 @@ package com.example.Backend.model;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 import java.time.LocalDateTime;
 
 @Entity

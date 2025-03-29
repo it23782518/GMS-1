@@ -28,17 +28,27 @@ const StatusBadge = ({ status }) => {
       border: "border-blue-200",
       icon: (
         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15" />
+        </svg>
+      ),
+    },
+    RESOLVED: {
+      bg: "bg-purple-100",
+      text: "text-purple-800",
+      border: "border-purple-200",
+      icon: (
+        <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
         </svg>
       ),
     },
     CLOSED: {
-      bg: "bg-green-100",
-      text: "text-green-800",
-      border: "border-green-200",
+      bg: "bg-red-100",
+      text: "text-red-800",
+      border: "border-red-200",
       icon: (
         <svg className="w-3 h-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
       ),
     }
@@ -69,6 +79,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     { value: 'ALL', label: 'All Statuses' },
     { value: 'OPEN', label: 'Open' },
     { value: 'IN_PROGRESS', label: 'In Progress' },
+    { value: 'RESOLVED', label: 'Resolved' },
     { value: 'CLOSED', label: 'Closed' }
   ];
 
@@ -79,6 +90,46 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     { value: 'MEDIUM', label: 'Medium' },
     { value: 'HIGH', label: 'High' }
   ];
+
+  // Calculate status counts for filter badges
+  const getStatusCounts = () => {
+    const counts = {
+      ALL: initialTickets?.length || 0,
+      OPEN: 0,
+      IN_PROGRESS: 0,
+      RESOLVED: 0,
+      CLOSED: 0
+    };
+    
+    initialTickets?.forEach(ticket => {
+      if (counts[ticket.status] !== undefined) {
+        counts[ticket.status]++;
+      }
+    });
+    
+    return counts;
+  };
+  
+  // Calculate priority counts for filter badges
+  const getPriorityCounts = () => {
+    const counts = {
+      ALL: initialTickets?.length || 0,
+      LOW: 0,
+      MEDIUM: 0,
+      HIGH: 0
+    };
+    
+    initialTickets?.forEach(ticket => {
+      if (counts[ticket.priority] !== undefined) {
+        counts[ticket.priority]++;
+      }
+    });
+    
+    return counts;
+  };
+  
+  const statusCounts = getStatusCounts();
+  const priorityCounts = getPriorityCounts();
 
   // Initialize tickets from props
   useEffect(() => {
@@ -211,98 +262,249 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
           <div className="bg-gradient-to-r from-rose-700 to-rose-500 p-6 flex flex-col sm:flex-row justify-between items-center">
             <div className="flex items-center mb-4 sm:mb-0">
               <div className="bg-white bg-opacity-30 p-2 rounded-lg mr-3 shadow-inner">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <svg className="w-6 h-6 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
                 </svg>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
-                Support Tickets
+                Tickets
               </h1>
             </div>
             <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white border-opacity-20">
-              <svg className="w-5 h-5 text-white opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <svg className="w-5 h-5 text-red opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
               </svg>
-              <span className="text-white font-medium">Total: {initialTickets?.length || 0} tickets</span>
+              <span className="text-red font-medium">Total: {initialTickets?.length || 0} tickets</span>
             </div>
           </div>
 
-          {/* Search and Filters section */}
-          <div className="p-4 bg-gray-50 border-b border-gray-200">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {/* Search box */}
-              <div className="space-y-2">
-                <label htmlFor="searchTerm" className="block text-sm font-medium text-gray-700">Search Tickets</label>
-                <div className="flex">
-                  <input
-                    type="text"
-                    id="searchTerm"
-                    className="flex-grow rounded-l-md border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 sm:text-sm"
-                    placeholder="Enter ticket ID or staff ID"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                  <select
-                    value={searchBy}
-                    onChange={(e) => setSearchBy(e.target.value)}
-                    className="border-gray-300 shadow-sm focus:border-rose-500 focus:ring-rose-500 sm:text-sm"
-                  >
-                    <option value="ticketId">By Ticket ID</option>
-                    <option value="staffId">By Staff ID</option>
-                  </select>
-                  <button
-                    onClick={handleSearch}
-                    className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-r-md text-white bg-rose-600 hover:bg-rose-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500"
-                    disabled={loading}
-                  >
-                    <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          {/* Status Filter Buttons */}
+          <div className="bg-gray-50 p-4 border-b border-gray-200 overflow-x-auto">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Filter by Status</h3>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setStatusFilter('ALL')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  statusFilter === 'ALL' 
+                    ? 'bg-rose-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>
+                All ({statusCounts.ALL})
+              </button>
+              
+              <button 
+                onClick={() => setStatusFilter('OPEN')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  statusFilter === 'OPEN' 
+                    ? 'bg-yellow-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 0h4m-4 0H8m4 0v4"></path>
+                </svg>
+                Open ({statusCounts.OPEN})
+              </button>
+              
+              <button 
+                onClick={() => setStatusFilter('IN_PROGRESS')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  statusFilter === 'IN_PROGRESS' 
+                    ? 'bg-blue-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path>
+                </svg>
+                In Progress ({statusCounts.IN_PROGRESS})
+              </button>
+              
+              <button 
+                onClick={() => setStatusFilter('RESOLVED')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  statusFilter === 'RESOLVED' 
+                    ? 'bg-purple-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+                Resolved ({statusCounts.RESOLVED})
+              </button>
+              
+              <button 
+                onClick={() => setStatusFilter('CLOSED')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  statusFilter === 'CLOSED' 
+                    ? 'bg-red-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Closed ({statusCounts.CLOSED})
+              </button>
+            </div>
+          </div>
+
+          {/* Priority Filter Buttons */}
+          <div className="bg-gray-50 p-4 border-b border-gray-200 overflow-x-auto">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Filter by Priority</h3>
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => setPriorityFilter('ALL')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  priorityFilter === 'ALL' 
+                    ? 'bg-rose-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                </svg>
+                All Priorities ({priorityCounts.ALL})
+              </button>
+              
+              <button 
+                onClick={() => setPriorityFilter('LOW')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  priorityFilter === 'LOW' 
+                    ? 'bg-green-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 15l7-7 7 7"></path>
+                </svg>
+                Low ({priorityCounts.LOW})
+              </button>
+              
+              <button 
+                onClick={() => setPriorityFilter('MEDIUM')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  priorityFilter === 'MEDIUM' 
+                    ? 'bg-yellow-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                Medium ({priorityCounts.MEDIUM})
+              </button>
+              
+              <button 
+                onClick={() => setPriorityFilter('HIGH')}
+                className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center shadow-sm ${
+                  priorityFilter === 'HIGH' 
+                    ? 'bg-red-600 text-white' 
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <svg className="w-3 h-3 sm:w-4 sm:h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                </svg>
+                High ({priorityCounts.HIGH})
+              </button>
+            </div>
+          </div>
+
+          {/* Enhanced Search UI */}
+          <div className="p-4 sm:p-6 border-b border-gray-200">
+            <div className="flex flex-col gap-4">
+              <div className="flex space-x-2 mb-1">
+                <button
+                  onClick={() => setSearchBy('ticketId')}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    searchBy === 'ticketId'
+                      ? 'bg-rose-100 text-rose-700 font-medium'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className="flex items-center">
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                    </svg>
+                    Search by Ticket ID
+                  </span>
+                </button>
+                <button
+                  onClick={() => setSearchBy('staffId')}
+                  className={`px-3 py-1 text-xs rounded-md ${
+                    searchBy === 'staffId'
+                      ? 'bg-rose-100 text-rose-700 font-medium'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  <span className="flex items-center">
+                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    Search by Staff ID
+                  </span>
+                </button>
+              </div>
+              <div className="flex w-full">
+                <div className="relative flex-grow">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
-                    Search
-                  </button>
+                  </div>
+                  <input
+                    className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-l-lg focus:ring-rose-500 focus:border-rose-500"
+                    placeholder={searchBy === 'ticketId' ? "Enter ticket ID..." : "Enter staff ID..."}
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+                  />
                 </div>
-              </div>
-              
-              {/* Status filter */}
-              <div className="w-full">
-                <label htmlFor="statusFilter" className="block text-sm font-medium text-gray-700 mb-1">Status Filter</label>
-                <select
-                  id="statusFilter"
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
+                <button
+                  className={`px-6 py-3 text-white font-medium rounded-r-lg shadow-md transform transition-all duration-200 min-w-[100px] flex-shrink-0 ${
+                    loading
+                      ? "bg-rose-400 cursor-not-allowed"
+                      : "bg-rose-600 hover:bg-rose-700 focus:ring-4 focus:ring-rose-300"
+                  }`}
+                  onClick={handleSearch}
                   disabled={loading}
                 >
-                  {statusOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
-              </div>
-              
-              {/* Priority filter */}
-              <div className="w-full">
-                <label htmlFor="priorityFilter" className="block text-sm font-medium text-gray-700 mb-1">Priority Filter</label>
-                <select
-                  id="priorityFilter"
-                  className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-rose-500 focus:border-rose-500 sm:text-sm"
-                  value={priorityFilter}
-                  onChange={(e) => setPriorityFilter(e.target.value)}
-                  disabled={loading}
-                >
-                  {priorityOptions.map(option => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
-                  ))}
-                </select>
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Searching...</span>
+                    </div>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                      </svg>
+                      Search
+                    </span>
+                  )}
+                </button>
               </div>
             </div>
-            
+
             <div className="mt-4 flex justify-end">
               <button
                 onClick={resetAll}
-                className="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 text-sm font-medium"
+                className="px-4 py-2 border border-gray-300 bg-white text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 text-sm font-medium flex items-center"
                 disabled={loading}
               >
-                Reset All
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path>
+                </svg>
+                Reset All Filters
               </button>
             </div>
           </div>
@@ -328,7 +530,6 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                   <th className="px-6 py-4 font-semibold">ID</th>
                   <th className="px-6 py-4 font-semibold">Type</th>
                   <th className="px-6 py-4 font-semibold">Status</th>
-                  <th className="px-6 py-4 font-semibold">Raised By</th>
                   <th className="px-6 py-4 font-semibold">Created</th>
                   <th className="px-6 py-4 font-semibold">Actions</th>
                 </tr>
@@ -347,7 +548,6 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                         <td className="px-6 py-4">
                           <StatusBadge status={ticket.status} />
                         </td>
-                        <td className="px-6 py-4">{ticket.raisedByName || 'Unknown'}</td>
                         <td className="px-6 py-4">{formatDate(ticket.createdAt)}</td>
                         <td className="px-6 py-4">
                           <button
@@ -374,7 +574,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                       </tr>
                       {expandedTicket === getTicketId(ticket) && (
                         <tr>
-                          <td colSpan="6" className="px-0 py-0 border-b">
+                          <td colSpan="5" className="px-0 py-0 border-b">
                             <div className="bg-gray-50 p-6 shadow-inner border-t border-gray-200">
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
@@ -408,10 +608,6 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                                 <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
                                   <h4 className="text-sm font-semibold text-gray-700 mb-3 pb-2 border-b border-gray-200">User & Assignment</h4>
                                   <div className="space-y-2">
-                                    <p className="flex justify-between">
-                                      <span className="text-sm font-medium text-gray-500">Raised By:</span>
-                                      <span className="text-sm text-gray-900">{getRaisedByInfo(ticket)}</span>
-                                    </p>
                                     <p className="flex justify-between">
                                       <span className="text-sm font-medium text-gray-500">Assigned To:</span>
                                       <span className="text-sm text-gray-900">{getAssignedToInfo(ticket)}</span>
@@ -464,6 +660,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                                             <option value="" disabled>Select Status</option>
                                             <option value="OPEN">Open</option>
                                             <option value="IN_PROGRESS">In Progress</option>
+                                            <option value="RESOLVED">Resolved</option>
                                             <option value="CLOSED">Closed</option>
                                           </select>
                                           <button
@@ -478,7 +675,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                                               </svg>
                                             ) : (
                                               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357-2H15"></path>
                                               </svg>
                                             )}
                                           </button>
@@ -496,7 +693,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-12">
+                    <td colSpan="5" className="text-center py-12">
                       <div className="flex flex-col items-center justify-center">
                         <div className="bg-gray-100 p-5 rounded-full mb-4">
                           <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -609,6 +806,7 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
                               <option value="" disabled>Select Status</option>
                               <option value="OPEN">Open</option>
                               <option value="IN_PROGRESS">In Progress</option>
+                              <option value="RESOLVED">Resolved</option>
                               <option value="CLOSED">Closed</option>
                             </select>
                             <button

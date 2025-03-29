@@ -43,17 +43,7 @@ const TicketsPage = () => {
           />
         ) : (
           <>
-            <div className="flex justify-end mb-6">
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-rose-600 text-white rounded-lg shadow hover:bg-rose-700 focus:ring-4 focus:ring-rose-300 transition-all duration-200 text-sm flex items-center"
-              >
-                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Create New Ticket
-              </button>
-            </div>
+            {/* Removed the Create New Ticket button that was here */}
 
             {error && (
               <div className="mb-6 text-rose-600 p-4 bg-rose-50 border-l-4 border-rose-600 rounded-md flex items-start">

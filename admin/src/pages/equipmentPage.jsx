@@ -67,20 +67,7 @@ const EquipmentPage = () => {
               </svg>
               <span className="whitespace-nowrap">View Gym Equipment</span>
             </Link>
-            <Link 
-              to="/add-equipment" 
-              className={`px-4 sm:px-5 md:px-7 py-3 md:py-4 text-sm font-medium flex items-center transition-all duration-300 group ${
-                currentPath === '/add-equipment' 
-                  ? 'bg-gradient-to-r from-rose-700 to-rose-500 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-rose-50 hover:text-rose-700'
-              }`}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <svg className="w-5 h-5 mr-2 transition-transform duration-300 group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              <span className="whitespace-nowrap">Add New Equipment</span>
-            </Link>
+            
             <Link 
               to="/maintenance" 
               className={`px-4 sm:px-5 md:px-7 py-3 md:py-4 text-sm font-medium flex items-center transition-all duration-300 group ${

@@ -19,6 +19,7 @@ public class MonthlyMaintenanceCostController {
 
     @GetMapping("/monthly-costs")
     public ResponseEntity<List<MonthlyMaintenanceCost>> getMonthlyCosts() {
+        maintenanceService.updateMonthlyCosts();
         return ResponseEntity.ok(maintenanceService.getAllMonthlyCosts());
     }
 
