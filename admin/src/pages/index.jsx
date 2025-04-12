@@ -4,9 +4,9 @@ import EquipmentList from "./Equipment/EquipmentList";
 import AddEquipmentForm from "./Equipment/AddEquipmentForm";
 import Header from "../components/header";
 import Footer from "../components/Footer";
-import MaintenanceScheduleList from "./Equipment/MaintenanceScheduleList";
-import MaintenanceScheduleAdd from "./Equipment/MaintenanceScheduleAdd";
-import MonthlyCostViewer from "./Equipment/MonthlyCostViewer";
+import MaintenanceScheduleList from "./Maintenance/MaintenanceScheduleList";
+import MaintenanceScheduleAdd from "./Maintenance/MaintenanceScheduleAdd";
+import MonthlyCostViewer from "./MonthlyCost/MonthlyCostViewer";
 import TicketsPage from "./TicketsPage";
 import AddTicketForm from "./Tickets/AddTicketForm";
 

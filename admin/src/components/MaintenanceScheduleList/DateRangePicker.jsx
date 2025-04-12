@@ -14,7 +14,6 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     return { month: today.getMonth(), year: today.getFullYear() };
   });
   
-  // Format date for display
   const formatDate = (date) => {
     if (!date) return '';
     return new Date(date).toLocaleDateString('en-US', { 
@@ -24,13 +23,11 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     });
   };
   
-  // Generate calendar days
   const generateCalendarDays = () => {
     const { month, year } = currentMonth;
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     
-    // Calculate days from previous month to fill first row
     const prevMonthDays = [];
     const prevMonthDaysCount = new Date(year, month, 0).getDate();
     for (let i = firstDay - 1; i >= 0; i--) {
@@ -42,7 +39,6 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
       });
     }
     
-    // Current month days
     const currentMonthDays = Array.from({ length: daysInMonth }, (_, i) => ({
       day: i + 1,
       month,
@@ -50,7 +46,6 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
       isCurrentMonth: true
     }));
     
-    // Next month days to fill last row
     const totalDaysSoFar = prevMonthDays.length + currentMonthDays.length;
     const nextMonthDays = Array.from({ length: (42 - totalDaysSoFar) }, (_, i) => ({
       day: i + 1,
@@ -62,7 +57,6 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
   
-  // Navigate to previous month
   const prevMonth = () => {
     setCurrentMonth(prev => {
       const newMonth = prev.month - 1;
@@ -73,7 +67,6 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     });
   };
   
-  // Navigate to next month
   const nextMonth = () => {
     setCurrentMonth(prev => {
       const newMonth = prev.month + 1;
@@ -84,12 +77,10 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     });
   };
   
-  // Format day as YYYY-MM-DD
   const formatDayToString = (day) => {
     return `${day.year}-${String(day.month + 1).padStart(2, '0')}-${String(day.day).padStart(2, '0')}`;
   };
   
-  // Check if date is within selected range
   const isInRange = (dateStr) => {
     if (!range.start || !range.end) return false;
     
@@ -100,21 +91,17 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     return date >= start && date <= end;
   };
   
-  // Check if date is the start or end of the range
   const isRangeEnd = (dateStr) => {
     if (!range.start || !range.end) return false;
     return dateStr === range.start || dateStr === range.end;
   };
   
-  // Handle day click
   const handleDayClick = (day) => {
     const dateStr = formatDayToString(day);
     
     if (!range.start || (range.start && range.end)) {
-      // Start new selection
       setRange({ start: dateStr, end: null });
     } else {
-      // Complete selection
       const startDate = new Date(range.start);
       const clickedDate = new Date(dateStr);
       
@@ -128,14 +115,12 @@ const DateRangePicker = ({ onRangeChange, initialRange = null }) => {
     }
   };
   
-  // Handle day hover for range preview
   const handleDayHover = (day) => {
     if (range.start && !range.end) {
       setHoverDate(formatDayToString(day));
     }
   };
   
-  // Check if date is in the hover preview range
   const isInHoverRange = (dateStr) => {
     if (!range.start || !hoverDate || range.end) return false;
     

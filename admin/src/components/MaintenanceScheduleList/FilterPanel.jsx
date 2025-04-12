@@ -16,13 +16,10 @@ const FilterPanel = ({
     technician: initialFilters.technician || 'ALL'
   });
   
-  // List of maintenance types
   const maintenanceTypes = ['ALL', 'PREVENTIVE', 'CORRECTIVE', 'PREDICTIVE', 'CONDITION_BASED'];
   
-  // List of status options
   const statusOptions = ['ALL', 'SCHEDULED', 'INPROGRESS', 'COMPLETED', 'CANCELED'];
   
-  // Handle filter changes
   const handleFilterChange = (field, value) => {
     setFilters(prev => ({
       ...prev,
@@ -30,7 +27,6 @@ const FilterPanel = ({
     }));
   };
   
-  // Handle cost range changes
   const handleCostRangeChange = (field, value) => {
     setFilters(prev => ({
       ...prev,
@@ -41,12 +37,10 @@ const FilterPanel = ({
     }));
   };
   
-  // Apply filters
   const applyFilters = () => {
     onApplyFilters(filters);
   };
   
-  // Reset filters
   const resetFilters = () => {
     setFilters({
       status: 'ALL',
@@ -97,7 +91,6 @@ const FilterPanel = ({
       
       {isExpanded && (
         <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-fadeIn">
-          {/* Status Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <div className="flex flex-wrap gap-2">
@@ -122,7 +115,6 @@ const FilterPanel = ({
             </div>
           </div>
           
-          {/* Maintenance Type Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Maintenance Type</label>
             <select
@@ -138,7 +130,6 @@ const FilterPanel = ({
             </select>
           </div>
           
-          {/* Cost Range Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Cost Range</label>
             <div className="flex space-x-2">
@@ -169,7 +160,6 @@ const FilterPanel = ({
             </div>
           </div>
           
-          {/* Equipment ID Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Equipment ID</label>
             <select
@@ -184,7 +174,6 @@ const FilterPanel = ({
             </select>
           </div>
           
-          {/* Technician Filter */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Technician</label>
             <select

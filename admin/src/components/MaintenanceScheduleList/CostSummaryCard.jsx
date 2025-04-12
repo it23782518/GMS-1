@@ -3,17 +3,15 @@ import PropTypes from 'prop-types';
 
 const CostSummaryCard = ({ schedules, className = '' }) => {
   const [activeType, setActiveType] = useState(null);
-  const [chartView, setChartView] = useState('donut'); // 'donut', 'bar', 'trend'
+  const [chartView, setChartView] = useState('donut');
   const canvasRef = useRef(null);
   const legendRef = useRef(null);
   
-  // Calculate cost metrics
   const totalCost = schedules.reduce((sum, s) => sum + parseFloat(s.maintenanceCost || 0), 0);
   const averageCost = schedules.length ? totalCost / schedules.length : 0;
   const highestCost = schedules.length ? Math.max(...schedules.map(s => parseFloat(s.maintenanceCost || 0))) : 0;
   const lowestCost = schedules.length ? Math.min(...schedules.map(s => parseFloat(s.maintenanceCost || 0))) : 0;
   
-  // Get cost data by maintenance type
   const costByType = schedules.reduce((acc, schedule) => {
     const type = schedule.maintenanceType || 'OTHER';
     if (!acc[type]) {
@@ -29,7 +27,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     return acc;
   }, {});
 
-  // Calculate cost data by month (for trend view)
   const costByMonth = schedules.reduce((acc, schedule) => {
     const date = new Date(schedule.maintenanceDate);
     const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
@@ -41,12 +38,9 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     return acc;
   }, {});
   
-  // Sort months chronologically
   const sortedMonths = Object.keys(costByMonth).sort();
   
-  // Colors for different maintenance types - with more options and case-insensitive matching
   const colorPalette = {
-    // Primary colors for exact matches
     'PREVENTIVE': '#3B82F6',     // Blue
     'CORRECTIVE': '#EF4444',     // Red
     'PREDICTIVE': '#10B981',     // Green
@@ -54,7 +48,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     'EMERGENCY': '#EC4899',      // Pink
     'CONDITION_BASED': '#8B5CF6', // Purple
     
-    // Additional colors for other types
     'PLANNED': '#0EA5E9',        // Sky blue
     'UNPLANNED': '#F43F5E',      // Rose
     'INSPECTION': '#14B8A6',     // Teal
@@ -64,13 +57,10 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     'OTHER': '#6B7280'           // Gray
   };
   
-  // Fixed color assignments for types that don't match the predefined palette
-  // This ensures each type gets a consistent, distinct color
   const [typeColorMap] = useState(() => {
     const map = {};
     const types = Object.keys(costByType);
     
-    // Predefined vibrant colors for fallback
     const fallbackColors = [
       '#3B82F6', // Blue
       '#EF4444', // Red
@@ -89,9 +79,7 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     
     let colorIndex = 0;
     
-    // Assign colors to each type
     types.forEach(type => {
-      // Try to find a match in the color palette (case-insensitive)
       const paletteKey = Object.keys(colorPalette).find(
         key => key.toUpperCase() === type.toUpperCase()
       );
@@ -99,7 +87,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       if (paletteKey) {
         map[type] = colorPalette[paletteKey];
       } else {
-        // If no match, assign a fallback color
         map[type] = fallbackColors[colorIndex % fallbackColors.length];
         colorIndex++;
       }
@@ -108,12 +95,10 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     return map;
   });
   
-  // Get color for a type
   const getTypeColor = (type) => {
-    return typeColorMap[type] || '#6B7280'; // Gray as ultimate fallback
+    return typeColorMap[type] || '#6B7280';
   };
 
-  // Draw chart based on the selected view
   useEffect(() => {
     if (!canvasRef.current || Object.keys(costByType).length === 0) return;
 
@@ -122,11 +107,9 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     const width = canvas.width;
     const height = canvas.height;
 
-    // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
     if (chartView === 'donut') {
-      // Draw donut chart
       const centerX = width / 2;
       const centerY = height / 2;
       const radius = Math.min(width, height) / 2 - 20;
@@ -137,7 +120,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
         const sliceAngle = (data.total / totalCost) * 2 * Math.PI;
         const isActive = activeType === type;
         
-        // Draw slice
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.arc(centerX, centerY, isActive ? radius + 5 : radius, startAngle, startAngle + sliceAngle);
@@ -146,12 +128,10 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
         ctx.fillStyle = getTypeColor(type);
         ctx.fill();
         
-        // Add slice border
         ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2;
         ctx.stroke();
         
-        // Add label if slice is big enough
         if (data.total / totalCost > 0.05) {
           const labelAngle = startAngle + sliceAngle / 2;
           const labelRadius = radius * 0.7;
@@ -168,7 +148,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
         startAngle += sliceAngle;
       });
 
-      // Draw center circle (donut hole)
       ctx.beginPath();
       ctx.arc(centerX, centerY, radius * 0.5, 0, 2 * Math.PI);
       ctx.fillStyle = '#ffffff';
@@ -177,7 +156,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       ctx.lineWidth = 1;
       ctx.stroke();
 
-      // Draw total cost in center
       ctx.fillStyle = '#1F2937';
       ctx.font = 'bold 16px Inter, system-ui, sans-serif';
       ctx.textAlign = 'center';
@@ -188,12 +166,10 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       ctx.fillText('Total Cost', centerX, centerY + 12);
     } 
     else if (chartView === 'bar') {
-      // Draw bar chart
       const barWidth = (width - 40) / Object.keys(costByType).length;
       const maxBarHeight = height - 60;
       const maxCost = Math.max(...Object.values(costByType).map(data => data.total));
       
-      // Draw axes
       ctx.beginPath();
       ctx.moveTo(20, 20);
       ctx.lineTo(20, height - 20);
@@ -202,13 +178,11 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       ctx.lineWidth = 1;
       ctx.stroke();
       
-      // Draw bars
       let barX = 30;
       Object.entries(costByType).forEach(([type, data]) => {
         const barHeight = (data.total / maxCost) * maxBarHeight;
         const isActive = activeType === type;
         
-        // Draw bar
         ctx.fillStyle = getTypeColor(type);
         ctx.fillRect(
           barX, 
@@ -217,7 +191,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
           barHeight
         );
         
-        // Add highlight for active bar
         if (isActive) {
           ctx.strokeStyle = '#ffffff';
           ctx.lineWidth = 2;
@@ -229,7 +202,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
           );
         }
         
-        // Add value on top of bar
         ctx.fillStyle = '#1F2937';
         ctx.font = '10px Inter, system-ui, sans-serif';
         ctx.textAlign = 'center';
@@ -239,7 +211,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
           height - 20 - barHeight - 8
         );
         
-        // Add type label below bar
         ctx.fillStyle = '#6B7280';
         ctx.font = '10px Inter, system-ui, sans-serif';
         ctx.textAlign = 'center';
@@ -253,29 +224,23 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       });
     }
     else if (chartView === 'trend') {
-      // Draw line chart (trend view) implementation remains the same
-      // ...
     }
   }, [schedules, costByType, costByMonth, sortedMonths, totalCost, activeType, chartView, typeColorMap]);
 
-  // Handle type hover
   const handleTypeHover = (type) => {
     setActiveType(type);
   };
 
-  // Get a percentage relative to total
   const getPercentage = (value) => {
     return totalCost ? Math.round((value / totalCost) * 100) : 0;
   };
 
-  // Debug function to display the assigned colors - can be removed in production
   const debugColorAssignments = () => {
     console.log("Type to Color Assignments:", typeColorMap);
   };
 
   return (
     <div className={`bg-white rounded-xl shadow-md overflow-hidden ${className}`}>
-      {/* Header with tabs */}
       <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 px-5 py-4 flex justify-between items-center">
         <h3 className="text-lg font-semibold text-gray-800">Maintenance Cost Summary</h3>
         
@@ -314,7 +279,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       </div>
       
       <div className="p-5">
-        {/* Cost stats cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6 animate-fadeIn">
           <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
             <p className="text-xs text-blue-600 mb-1 flex items-center">
@@ -354,9 +318,7 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
           </div>
         </div>
         
-        {/* Chart and legend layout */}
         <div className="flex flex-col md:flex-row">
-          {/* Chart area */}
           <div className="flex-grow flex justify-center items-center min-h-[240px] md:min-h-[280px]">
             <canvas 
               ref={canvasRef} 
@@ -366,7 +328,6 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
             />
           </div>
           
-          {/* Legend area */}
           <div 
             ref={legendRef}
             className={`md:w-64 mt-4 md:mt-0 md:ml-4 ${chartView === 'trend' ? 'hidden md:block' : ''}`}
@@ -400,14 +361,12 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
               ))}
             </div>
             
-            {/* Hover tip */}
             <div className="mt-4 text-xs text-gray-500 italic">
               Hover over items to highlight in chart
             </div>
           </div>
         </div>
         
-        {/* Cost trend insights remains the same */}
       </div>
     </div>
   );

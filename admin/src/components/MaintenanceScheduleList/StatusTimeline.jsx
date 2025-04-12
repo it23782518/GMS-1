@@ -12,12 +12,10 @@ const StatusTimeline = ({
   const statuses = ['SCHEDULED', 'INPROGRESS', 'COMPLETED', 'CANCELED', 'OVERDUE'];
   const currentIndex = statuses.indexOf(currentStatus);
   
-  // Filter out CANCELED and OVERDUE for normal progression
   const displayStatuses = statuses.filter(status => !['CANCELED', 'OVERDUE'].includes(status));
   const isCanceled = currentStatus === 'CANCELED';
   const isOverdue = currentStatus === 'OVERDUE';
 
-  // Get status display name
   const getStatusName = (status) => {
     switch(status) {
       case 'SCHEDULED': return 'Scheduled';
@@ -29,7 +27,6 @@ const StatusTimeline = ({
     }
   };
 
-  // Get status icon
   const getStatusIcon = (status, isCompleted) => {
     if (isCompleted) {
       return (
@@ -63,7 +60,6 @@ const StatusTimeline = ({
     }
   };
 
-  // Get color class based on status
   const getStatusColor = (status, isActive, isCompleted) => {
     if (isCompleted) return 'bg-green-500 text-white border-green-600';
     if (isActive) {
@@ -79,7 +75,6 @@ const StatusTimeline = ({
     return 'bg-gray-100 text-gray-500 border-gray-300 hover:bg-gray-200 transition-colors duration-200';
   };
 
-  // Format timestamp
   const formatTimestamp = (timestamp) => {
     if (!timestamp) return null;
     const date = new Date(timestamp);
@@ -91,7 +86,6 @@ const StatusTimeline = ({
     });
   };
 
-  // Get progress percentage for the bar
   const getProgressPercentage = () => {
     if (isCanceled || isOverdue) return 100;
     switch(currentIndex) {
@@ -103,7 +97,6 @@ const StatusTimeline = ({
     }
   };
 
-  // Get progress bar color
   const getProgressColor = () => {
     if (isCanceled) return 'bg-red-500';
     if (isOverdue) return 'bg-orange-500';
@@ -112,7 +105,6 @@ const StatusTimeline = ({
 
   return (
     <div className={`w-full py-2 ${className}`}>
-      {/* Special visualization for Canceled or Overdue */}
       {(isCanceled || isOverdue) ? (
         <div className="mb-6">
           <div className={`flex items-center mb-2 animate-fadeIn`} style={{ animationDelay: `${animationDelay + 0.1}s` }}>
@@ -124,7 +116,6 @@ const StatusTimeline = ({
             </span>
           </div>
           
-          {/* Additional info for canceled/overdue state */}
           {showDetails && (
             <div className={`mt-2 p-3 rounded-md ${isCanceled ? 'bg-red-50 border border-red-100' : 'bg-orange-50 border border-orange-100'} animate-fadeIn`} 
                  style={{ animationDelay: `${animationDelay + 0.2}s` }}>
@@ -161,7 +152,6 @@ const StatusTimeline = ({
         </div>
       ) : (
         <>
-          {/* Main timeline for normal progression */}
           <div className={`flex items-center ${compact ? 'justify-between' : 'justify-around'} mb-6`}>
             {displayStatuses.map((status, index) => {
               const isActive = index === currentIndex;
@@ -169,7 +159,6 @@ const StatusTimeline = ({
               
               return (
                 <div key={status} className="relative group">
-                  {/* Line connectors */}
                   {index > 0 && (
                     <div className="absolute top-4 w-full h-0.5 bg-gray-200 -left-1/2 -z-10">
                       {index <= currentIndex && (
@@ -185,7 +174,6 @@ const StatusTimeline = ({
                     </div>
                   )}
                   
-                  {/* Status node */}
                   <div className="flex flex-col items-center">
                     <div 
                       className={`
@@ -201,12 +189,10 @@ const StatusTimeline = ({
                       {getStatusIcon(status, isCompleted)}
                     </div>
                     
-                    {/* Status label */}
                     <div className={`text-xs mt-2 font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>
                       {getStatusName(status)}
                     </div>
                     
-                    {/* Timestamp if available */}
                     {showDetails && timestamps[status] && (
                       <div className="text-xs mt-1 text-gray-400">
                         {formatTimestamp(timestamps[status])}
@@ -214,7 +200,6 @@ const StatusTimeline = ({
                     )}
                   </div>
                   
-                  {/* Tooltip on hover */}
                   <div className="absolute -top-16 left-1/2 transform -translate-x-1/2 w-48 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-10">
                     <div className="bg-gray-800 text-white text-xs rounded p-2 shadow-lg">
                       <p className="font-semibold mb-1">{getStatusName(status)}</p>
@@ -231,7 +216,6 @@ const StatusTimeline = ({
             })}
           </div>
 
-          {/* Progress bar */}
           <div className="relative h-1.5 w-full mb-2 bg-gray-100 rounded-full overflow-hidden">
             <div 
               className={`absolute h-full ${getProgressColor()} rounded-full transition-all duration-500 animate-widthGrow`}
@@ -246,7 +230,6 @@ const StatusTimeline = ({
             ></div>
           </div>
           
-          {/* Current status text */}
           <div className="text-center text-xs text-gray-500">
             {getProgressPercentage() === 100 ? 
               'Maintenance completed' : 

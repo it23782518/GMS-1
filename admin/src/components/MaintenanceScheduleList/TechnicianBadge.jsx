@@ -1,9 +1,7 @@
-// New component to create: TechnicianBadge.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
 
 const TechnicianBadge = ({ name, size = 'md' }) => {
-  // Generate consistent color based on name
   const getColor = (name) => {
     const colors = [
       'bg-blue-100 text-blue-800',

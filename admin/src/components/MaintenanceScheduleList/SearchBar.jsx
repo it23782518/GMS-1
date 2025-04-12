@@ -23,7 +23,6 @@ const SearchBar = ({
   const historyRef = useRef(null);
   const tipsRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (historyRef.current && !historyRef.current.contains(event.target)) {
@@ -40,7 +39,6 @@ const SearchBar = ({
     };
   }, []);
 
-  // Focus search input when pressing / key
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
@@ -71,7 +69,6 @@ const SearchBar = ({
     setShowHistory(false);
   };
 
-  // Get status color based on value
   const getStatusColor = (value) => {
     switch (value) {
       case 'COMPLETED':
@@ -89,7 +86,6 @@ const SearchBar = ({
     }
   };
 
-  // Get status icon based on value
   const getStatusIcon = (value) => {
     switch (value) {
       case 'COMPLETED':
@@ -133,10 +129,8 @@ const SearchBar = ({
 
   return (
     <div className="bg-white rounded-lg shadow-md mb-6 animate-slideIn transition-all duration-300">
-      {/* Main search bar and filters */}
       <div className="p-4">
         <div className="flex flex-col lg:flex-row gap-4">
-          {/* Search input section */}
           <div className="flex-grow relative">
             <div className="relative">
               <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
@@ -157,7 +151,6 @@ const SearchBar = ({
                 aria-label="Search"
               />
               
-              {/* Clear and history buttons */}
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-1">
                 {searchTerm && (
                   <button 
@@ -202,7 +195,6 @@ const SearchBar = ({
               </div>
             </div>
             
-            {/* Search history dropdown */}
             {showHistory && (
               <div 
                 ref={historyRef}
@@ -238,7 +230,6 @@ const SearchBar = ({
               </div>
             )}
             
-            {/* Search tips */}
             {showTips && (
               <div 
                 ref={tipsRef}
@@ -257,7 +248,6 @@ const SearchBar = ({
             )}
           </div>
           
-          {/* Action buttons */}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={onSearch}
@@ -290,7 +280,6 @@ const SearchBar = ({
           </div>
         </div>
         
-        {/* Status filters in a scrollable row */}
         {statusOptions.length > 0 && (
           <div className="mt-3 flex space-x-1 overflow-x-auto pb-1 no-scrollbar">
             {statusOptions.map(option => (
@@ -312,7 +301,6 @@ const SearchBar = ({
           </div>
         )}
         
-        {/* Active filters pills */}
         {(searchTerm || statusFilter !== 'ALL' || 
           (advancedFilters && Object.keys(advancedFilters).some(key => advancedFilters[key]))) && (
           <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs text-gray-600">
@@ -358,7 +346,6 @@ const SearchBar = ({
               </div>
             )}
             
-            {/* Advanced filter pills */}
             {advancedFilters && Object.entries(advancedFilters).map(([key, value]) => {
               if (!value) return null;
               return (
@@ -398,7 +385,6 @@ const SearchBar = ({
         )}
       </div>
       
-      {/* Advanced search panel that slides in/out */}
       {isAdvancedMode && onAdvancedFilterChange && (
         <div className="border-t border-gray-200 animate-fadeIn">
           <div className="p-4 bg-gray-50">
@@ -415,7 +401,6 @@ const SearchBar = ({
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {/* Equipment Type Filter */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Equipment Type</label>
                 <select
@@ -431,7 +416,6 @@ const SearchBar = ({
                 </select>
               </div>
               
-              {/* Cost Range */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Cost Range</label>
                 <div className="flex gap-2 items-center">
@@ -459,7 +443,6 @@ const SearchBar = ({
                 </div>
               </div>
               
-              {/* Technician Filter */}
               <div>
                 <label className="block text-xs font-medium text-gray-700 mb-1">Technician</label>
                 <input
@@ -472,7 +455,6 @@ const SearchBar = ({
               </div>
             </div>
             
-            {/* Apply/Reset buttons */}
             <div className="mt-4 flex justify-end space-x-2">
               <button
                 onClick={() => onAdvancedFilterChange({})}
@@ -493,7 +475,6 @@ const SearchBar = ({
         </div>
       )}
       
-      {/* Keyboard shortcut hint */}
       <div className="p-2 text-xs text-center text-gray-500 border-t border-gray-100 bg-gray-50">
         <div className="flex items-center justify-center">
           <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor">

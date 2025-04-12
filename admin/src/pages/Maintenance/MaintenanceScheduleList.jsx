@@ -14,21 +14,18 @@ import {
 import { Link } from 'react-router-dom';
 import Toast from '../../components/Toast';
 import Modal from '../../components/Modal';
-import SearchBar from '../../components/SearchBar';
-import StatusBadge from '../../components/StatusBadge';
-import ActionButton from '../../components/ActionButton';
-import DashboardCard from '../../components/DashboardCard';
-import EditableCell from '../../components/EditableCell';
-import StatusTimeline from '../../components/StatusTimeline';
-import CostSummaryCard from '../../components/CostSummaryCard';
-import FilterPanel from '../../components/FilterPanel';
-import ExpandableTableRow from '../../components/ExpandableTableRow';
-import StatsCard from '../../components/StatsCard';
-import DateRangePicker from '../../components/DateRangePicker';
-import TechnicianBadge from '../../components/TechnicianBadge';
+import SearchBar from '../../components/MaintenanceScheduleList/SearchBar';
+import ActionButton from '../../components/MaintenanceScheduleList/ActionButton';
+import EditableCell from '../../components/MaintenanceScheduleList/EditableCell';
+import StatusTimeline from '../../components/MaintenanceScheduleList/StatusTimeline';
+import CostSummaryCard from '../../components/MaintenanceScheduleList/CostSummaryCard';
+import FilterPanel from '../../components/MaintenanceScheduleList/FilterPanel';
+import ExpandableTableRow from '../../components/MaintenanceScheduleList/ExpandableTableRow';
+import StatsCard from '../../components/MaintenanceScheduleList/StatsCard';
+import DateRangePicker from '../../components/MaintenanceScheduleList/DateRangePicker';
+import TechnicianBadge from '../../components/MaintenanceScheduleList/TechnicianBadge';
 
 const MaintenanceScheduleList = () => {
-  // State variables
   const [schedules, setSchedules] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
@@ -53,7 +50,6 @@ const MaintenanceScheduleList = () => {
     dateRange: { start: null, end: null }
   });
   
-  // Modal state
   const [modal, setModal] = useState({ 
     isOpen: false, 
     title: '', 
@@ -62,7 +58,6 @@ const MaintenanceScheduleList = () => {
     type: 'info' 
   });
 
-  // Options for status filter
   const statusOptions = [
     { value: 'ALL', label: 'All Statuses' },
     { value: 'SCHEDULED', label: 'Scheduled' },
@@ -71,7 +66,6 @@ const MaintenanceScheduleList = () => {
     { value: 'CANCELED', label: 'Canceled' }
   ];
 
-  // Fetch schedules based on status filter
 const fetchSchedules = async () => {
   try {
     setLoading(true);
@@ -83,7 +77,6 @@ const fetchSchedules = async () => {
       response = await filterMaintenanceScheduleByStatus(statusFilter);
     }
     
-    // If we have search term, filter the results accordingly
     let filteredData = response.data;
     if (searchTerm) {
       filteredData = filteredData.filter(schedule => 
@@ -95,17 +88,16 @@ const fetchSchedules = async () => {
     }
     
     setSchedules(filteredData);
-    return filteredData; // Return for the applyAllFilters function to use
+    return filteredData; 
   } catch (error) {
     console.error('Error fetching schedules:', error);
     showToast('Failed to fetch maintenance schedules', 'error');
-    return []; // Return empty array in case of error
+    return [];
   } finally {
     setLoading(false);
   }
 };
 
-  // Search handler
   const handleSearch = async () => {
     if (!searchTerm) {
       fetchSchedules();
@@ -137,7 +129,6 @@ const fetchSchedules = async () => {
     }
   };
 
-  // Toggle fullscreen mode
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
     if (!isFullscreen) {
@@ -151,7 +142,6 @@ const fetchSchedules = async () => {
     }
   };
 
-  // Delete confirmation modal
   const handleDelete = async (id) => {
     setModal({
       isOpen: true,
@@ -171,7 +161,6 @@ const fetchSchedules = async () => {
     });
   };
 
-  // Date update confirmation
   const handleUpdateDate = async (id) => {
     setModal({
       isOpen: true,
@@ -192,7 +181,6 @@ const fetchSchedules = async () => {
     });
   };
 
-  // Modified status update modal 
 const handleUpdateStatus = async (id) => {
   const schedule = schedules.find(s => s.scheduleId === id);
   setModal({
@@ -222,7 +210,6 @@ const handleUpdateStatus = async (id) => {
   });
 };
 
-  // Cost update confirmation
   const handleUpdateCost = async (id) => {
     setModal({
       isOpen: true,
@@ -243,7 +230,6 @@ const handleUpdateStatus = async (id) => {
     });
   };
 
-  // Description update confirmation
   const handleUpdateDescription = async (id) => {
     setModal({
       isOpen: true,
@@ -264,7 +250,6 @@ const handleUpdateStatus = async (id) => {
     });
   };
 
-  // Technician update confirmation
   const handleUpdateTechnician = async (id) => {
     setModal({
       isOpen: true,
@@ -285,7 +270,6 @@ const handleUpdateStatus = async (id) => {
     });
   };
 
-  // Sorting handler
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -295,32 +279,26 @@ const handleUpdateStatus = async (id) => {
     }
   };
 
-  // Toast notification helper
   const showToast = (message, type = 'info') => {
     setToast({ visible: true, message, type });
   };
 
-  // Close toast
   const closeToast = () => {
     setToast({ ...toast, visible: false });
   };
 
-  // Close modal
   const closeModal = () => {
     setModal({ ...modal, isOpen: false });
   };
 
-  // Fetch schedules on component mount and when status filter changes
   useEffect(() => {
     fetchSchedules();
   }, [statusFilter]);
 
-  // Reset to first page when search or filter changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, statusFilter]);
 
-  // Listen for fullscreen change events
   useEffect(() => {
     const handleFullscreenChange = () => {
       setIsFullscreen(!!document.fullscreenElement);
@@ -332,23 +310,19 @@ const handleUpdateStatus = async (id) => {
     };
   }, []);
 
-  // Pagination and sorting logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   
-  // Apply sorting to schedules
   const sortedSchedules = [...schedules];
   if (sortField) {
     sortedSchedules.sort((a, b) => {
       let aValue = a[sortField];
       let bValue = b[sortField];
       
-      // Handle numeric values
       if (!isNaN(parseFloat(aValue)) && !isNaN(parseFloat(bValue))) {
         aValue = parseFloat(aValue);
         bValue = parseFloat(bValue);
       } else if (typeof aValue === 'string' && typeof bValue === 'string') {
-        // Case-insensitive string comparison
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
@@ -359,11 +333,9 @@ const handleUpdateStatus = async (id) => {
     });
   }
   
-  // Paginate the sorted schedules
   const currentItems = sortedSchedules.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(schedules.length / itemsPerPage);
 
-  // Table column configuration
   const columns = [
     { field: 'scheduleId', label: 'ID', sortable: true },
     { field: 'equipmentId', label: 'Equipment ID', sortable: true },
@@ -376,7 +348,6 @@ const handleUpdateStatus = async (id) => {
     { field: null, label: 'Actions', sortable: false }
   ];
 
-  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="animate-pulse">
       <div className="h-10 bg-gray-200 rounded-md mb-4 w-3/4"></div>
@@ -392,21 +363,16 @@ const handleUpdateStatus = async (id) => {
     </div>
   );
 
-  // Add this function to handle client-side filtering
 const applyAllFilters = (activeFilters) => {
   setLoading(true);
   
-  // Start with server-side filtering for status only
   fetchSchedules().then(() => {
-    // Then apply all other filters client-side
     const filtered = schedules.filter(schedule => {
-      // Type filter
       if (activeFilters.type && activeFilters.type !== 'ALL' && 
           schedule.maintenanceType !== activeFilters.type) {
         return false;
       }
       
-      // Cost range filter
       if (activeFilters.costRange) {
         const cost = parseFloat(schedule.maintenanceCost);
         if (activeFilters.costRange.min && cost < parseFloat(activeFilters.costRange.min)) {
@@ -417,19 +383,16 @@ const applyAllFilters = (activeFilters) => {
         }
       }
       
-      // Equipment ID filter
       if (activeFilters.equipmentId && activeFilters.equipmentId !== 'ALL' && 
           schedule.equipmentId !== activeFilters.equipmentId) {
         return false;
       }
       
-      // Technician filter
       if (activeFilters.technician && activeFilters.technician !== 'ALL' && 
           schedule.technician !== activeFilters.technician) {
         return false;
       }
       
-      // Date range filter
       if (activeFilters.dateRange && 
           (activeFilters.dateRange.start || activeFilters.dateRange.end)) {
         const scheduleDate = new Date(schedule.maintenanceDate);
@@ -445,11 +408,9 @@ const applyAllFilters = (activeFilters) => {
         }
       }
       
-      // Passed all filters
       return true;
     });
     
-    // Update the schedules
     setSchedules(filtered);
     setLoading(false);
   });
@@ -529,7 +490,6 @@ const resetAllFilters = () => {
       <div className="mb-6 animate-fadeIn" style={{ animationDelay: '0.25s' }}>
         <FilterPanel 
           onApplyFilters={(newFilters) => {
-            // Update local filter state
             setFilters(prevFilters => ({
               ...prevFilters,
               status: newFilters.status || 'ALL',
@@ -539,15 +499,12 @@ const resetAllFilters = () => {
               technician: newFilters.technician || 'ALL'
             }));
             
-            // Also update the status filter for compatibility with existing code
             setStatusFilter(newFilters.status || 'ALL');
             
-            // Also update search term for compatibility
             if (newFilters.searchTerm !== undefined) {
               setSearchTerm(newFilters.searchTerm);
             }
             
-            // Apply all filters to the data
             applyAllFilters(newFilters);
           }}
           initialFilters={{
@@ -573,20 +530,18 @@ const resetAllFilters = () => {
       <div className="flex justify-end mb-4 animate-fadeIn" style={{ animationDelay: '0.4s' }}>
         <DateRangePicker 
           onRangeChange={(range) => {
-            // Update date range in filters
             setFilters(prevFilters => ({
               ...prevFilters,
               dateRange: range
             }));
             
-            // Apply all filters including this new date range
             applyAllFilters({...filters, dateRange: range});
           }} 
           initialRange={filters.dateRange}
         />
       </div>
 
-      {/* Enhanced Statistics Summary */}
+      {/* Statistics Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-slideIn" style={{ animationDelay: '0.2s' }}>
         <StatsCard
           title="Total Schedules"
@@ -689,17 +644,14 @@ const resetAllFilters = () => {
                     schedule={schedule}
                     onDelete={handleDelete}
                     onView={(id) => {
-                      // Navigate to details page
                       window.location.href = `/maintenance-details/${id}`;
                     }}
                     onEdit={(field, id) => {
-                      // Handle edit based on field
                       if (field === 'description') {
                         setEditDescription({ id: id, description: schedule.maintenanceDescription });
                       } else if (field === 'technician') {
                         setEditTechnician({ id: id, technician: schedule.technician });
                       }
-                      // Add other field cases as needed
                     }}
                   >
                     <td className="p-3 border">{schedule.scheduleId}</td>
@@ -752,7 +704,7 @@ const resetAllFilters = () => {
                         </div>
                       )}
                     </td>
-                    {/* Status field with direct dropdown implementation */}
+                    {/* Status field  */}
                     <td className="p-3 border">
                       {editStatus.id === schedule.scheduleId ? (
                         <div className="flex gap-2 animate-scaleIn">
@@ -845,7 +797,6 @@ const resetAllFilters = () => {
               </button>
               <div className="hidden md:flex space-x-2">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  // Logic to show relevant page numbers around current page
                   let pageNum;
                   if (totalPages <= 5) {
                     pageNum = i + 1;

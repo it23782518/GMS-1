@@ -18,19 +18,16 @@ const EditableCell = ({
   const [error, setError] = useState('');
   const inputRef = useRef(null);
   
-  // Focus input when entering edit mode
   useEffect(() => {
     if (isEditing && inputRef.current) {
       inputRef.current.focus();
       
-      // Select all text for text inputs
       if (inputType === 'text' || inputType === 'number' || inputType === 'email') {
         inputRef.current.select();
       }
     }
   }, [isEditing, inputType]);
   
-  // Handle Enter and Escape keys
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -40,7 +37,6 @@ const EditableCell = ({
     }
   };
   
-  // Validate before saving
   const handleSave = () => {
     if (validation) {
       const validationResult = validation(editValue);
@@ -53,7 +49,6 @@ const EditableCell = ({
     onSave();
   };
   
-  // Render appropriate input based on inputType
   const renderInput = () => {
     const commonProps = {
       ref: inputRef,
@@ -124,7 +119,6 @@ const EditableCell = ({
     }
   };
   
-  // Display component when not editing
   const renderDisplay = () => {
     if (displayComponent) return displayComponent;
     
