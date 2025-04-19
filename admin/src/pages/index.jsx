@@ -101,8 +101,8 @@ const EquipmentPage = () => {
               to="/tickets" 
               className={`px-4 sm:px-5 md:px-7 py-3 md:py-4 text-sm font-medium flex items-center transition-all duration-300 group ${
                 currentPath === '/tickets' 
-                  ? 'bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                  ? 'bg-gradient-to-r from-rose-700 to-rose-500 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-rose-50 hover:text-rose-700'
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >
@@ -115,8 +115,8 @@ const EquipmentPage = () => {
               to="/raise-ticket" 
               className={`px-4 sm:px-5 md:px-7 py-3 md:py-4 text-sm font-medium flex items-center transition-all duration-300 group ${
                 currentPath === '/raise-ticket' 
-                  ? 'bg-gradient-to-r from-blue-700 to-blue-500 text-white shadow-md'
-                  : 'text-gray-700 hover:bg-blue-50 hover:text-blue-700'
+                  ? 'bg-gradient-to-r from-rose-700 to-rose-500 text-white shadow-md'
+                  : 'text-gray-700 hover:bg-rose-50 hover:text-rose-700'
               }`}
               onClick={() => setMobileMenuOpen(false)}
             >

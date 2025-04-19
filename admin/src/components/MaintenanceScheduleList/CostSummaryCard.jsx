@@ -57,13 +57,10 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
     'OTHER': '#6B7280'           // Gray
   };
   
-  const [typeColorMap, setTypeColorMap] = useState({});
-
-  useEffect(() => {
+  const [typeColorMap] = useState(() => {
+    const map = {};
     const types = Object.keys(costByType);
-    if (types.length === 0) return;
     
-    const newColorMap = {};
     const fallbackColors = [
       '#3B82F6', // Blue
       '#EF4444', // Red
@@ -77,42 +74,29 @@ const CostSummaryCard = ({ schedules, className = '' }) => {
       '#14B8A6', // Teal
       '#84CC16', // Lime
       '#F43F5E', // Rose
+      '#6B7280', // Gray
     ];
     
     let colorIndex = 0;
     
     types.forEach(type => {
-      // First try for exact match
-      if (colorPalette[type]) {
-        newColorMap[type] = colorPalette[type];
-        return;
-      }
-      
-      // Then try case-insensitive match
       const paletteKey = Object.keys(colorPalette).find(
         key => key.toUpperCase() === type.toUpperCase()
       );
       
       if (paletteKey) {
-        newColorMap[type] = colorPalette[paletteKey];
+        map[type] = colorPalette[paletteKey];
       } else {
-        // If no match found, use a fallback color
-        newColorMap[type] = fallbackColors[colorIndex % fallbackColors.length];
+        map[type] = fallbackColors[colorIndex % fallbackColors.length];
         colorIndex++;
       }
     });
     
-    setTypeColorMap(newColorMap);
-    
-    // Debug the color assignments
-    console.log("Type to Color Assignments:", newColorMap);
-  }, [costByType]);
-
+    return map;
+  });
+  
   const getTypeColor = (type) => {
-    // If typeColorMap doesn't have this type yet, return a vibrant color instead of gray
-    return typeColorMap[type] || 
-      colorPalette[Object.keys(colorPalette)[Math.floor(Math.random() * Object.keys(colorPalette).length)]] || 
-      '#3B82F6'; // Default to blue instead of gray
+    return typeColorMap[type] || '#6B7280';
   };
 
   useEffect(() => {

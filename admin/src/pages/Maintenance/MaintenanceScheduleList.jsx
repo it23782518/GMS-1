@@ -23,7 +23,7 @@ import FilterPanel from '../../components/MaintenanceScheduleList/FilterPanel';
 import ExpandableTableRow from '../../components/MaintenanceScheduleList/ExpandableTableRow';
 import StatsCard from '../../components/MaintenanceScheduleList/StatsCard';
 import DateRangePicker from '../../components/MaintenanceScheduleList/DateRangePicker';
-import Pagination from '../../components/common/Pagination';
+import Pagination from '../../components/Pagination';
 import TechnicianBadge from '../../components/MaintenanceScheduleList/TechnicianBadge';
 
 const MaintenanceScheduleList = () => {
