@@ -2,6 +2,8 @@ import axios from "axios";
 
 const BASE_URL = "http://localhost:8090";
 
+// User API
+
 export const addEquipment = async (equipment) => {
   return axios.post(`${BASE_URL}/api/equipment`,equipment);
 };
@@ -37,6 +39,8 @@ export const searchEquipmentByName = async (search) => {
 export const filterEquipmentByStatus = async (status) => {
   return axios.get(`${BASE_URL}/api/equipment/filter-by-status?status=${status}`);
 };
+
+// Maintenance Schedule API
 
 export const addMaintenanceSchedule = async (maintenanceSchedule) => {
   return axios.post(`${BASE_URL}/api/maintenance-schedule`, maintenanceSchedule);
@@ -82,6 +86,8 @@ export const filterMaintenanceScheduleByStatus = async (status) => {
   return axios.get(`${BASE_URL}/api/maintenance-schedule/filter-by-status?status=${status}`);
 }
 
+// Monthly Maintenance Cost API
+
 export const monthlyMaintenanceCost = async () => {
   return axios.get(`${BASE_URL}/api/monthly-costs`);
 };
@@ -97,6 +103,9 @@ export const filterByMonth = async (month) => {
 export const filterByYear = async (year) => {
   return axios.get(`${BASE_URL}/api/filter-yearly-cost?year=${year}`);
 };
+
+
+// Ticket Management API
 
 export const getAllTickets = async () => {
   return axios.get(`${BASE_URL}/api/tickets/search`);

@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { addMaintenanceSchedule, getEquipment } from "../../services/api";
+import { 
+  addMaintenanceSchedule, 
+  getEquipment, 
+  updateMonthlyCost 
+} from "../../services/api";
 import { useNavigate } from 'react-router-dom';
 import Toast from '../../components/Toast';
 import Modal from '../../components/Modal';
@@ -183,7 +187,15 @@ const MaintenanceScheduleAdd = () => {
         maintenanceCost: parseFloat(formData.maintenanceCost) || 0
       };
       await addMaintenanceSchedule(scheduleData);
-      showToast('Maintenance schedule added successfully!', 'success');
+      
+      // Automatically update monthly costs after adding a maintenance schedule
+      try {
+        await updateMonthlyCost();
+        showToast('Maintenance schedule added and monthly costs updated successfully!', 'success');
+      } catch (error) {
+        console.error('Error updating monthly costs:', error);
+        showToast('Maintenance schedule added successfully, but monthly costs update failed.', 'warning');
+      }
       
       setFormData({
         equipmentId: '',

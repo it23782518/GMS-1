@@ -9,6 +9,7 @@ import {
 } from '../../services/api';
 import { Link } from 'react-router-dom';
 import ConfirmationModal from '../../components/TicketList/ConfirmationModal';
+import StatusChangePreview from '../../components/TicketList/StatusChangePreview';
 
 // Import our component files
 import StatusBadge from '../../components/TicketList/StatusBadge';
@@ -246,7 +247,12 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     
     showConfirmationModal(
       'Confirm Status Update',
-      `Are you sure you want to update the status of ticket #${ticketId} to ${status.replace(/_/g, " ")}?`,
+      <div className="space-y-4">
+        <p className="text-sm text-gray-600">Are you sure you want to update the status of ticket #{ticketId} to {status.replace(/_/g, " ")}?</p>
+        <div className="bg-gray-50 p-4 rounded-lg">
+          <StatusChangePreview currentStatus={status} />
+        </div>
+      </div>,
       async () => {
         try {
           setLoading(true);
