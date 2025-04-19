@@ -23,6 +23,7 @@ import FilterPanel from '../../components/MaintenanceScheduleList/FilterPanel';
 import ExpandableTableRow from '../../components/MaintenanceScheduleList/ExpandableTableRow';
 import StatsCard from '../../components/MaintenanceScheduleList/StatsCard';
 import DateRangePicker from '../../components/MaintenanceScheduleList/DateRangePicker';
+import Pagination from '../../components/common/Pagination';
 import TechnicianBadge from '../../components/MaintenanceScheduleList/TechnicianBadge';
 
 const MaintenanceScheduleList = () => {
@@ -162,10 +163,31 @@ const fetchSchedules = async () => {
   };
 
   const handleUpdateDate = async (id) => {
+    const schedule = schedules.find(s => s.scheduleId === id);
+    const oldDate = new Date(schedule.maintenanceDate).toLocaleDateString();
+    const newDate = new Date(editDate.date).toLocaleDateString();
+    
     setModal({
       isOpen: true,
       title: 'Confirm Date Change',
-      message: 'Are you sure you want to update the maintenance date?',
+      message: (
+        <div className="space-y-3">
+          <p>Are you sure you want to update the maintenance date?</p>
+          <div className="bg-gray-50 p-3 rounded-lg">
+            <p className="text-sm text-gray-500 mb-2">Date change preview:</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="text-xs text-gray-500">Current date:</span>
+                <div className="font-medium text-red-600 line-through">{oldDate}</div>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500">New date:</span>
+                <div className="font-medium text-green-600">{newDate}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
       type: 'warning',
       onConfirm: async () => {
         try {
@@ -363,60 +385,91 @@ const handleUpdateStatus = async (id) => {
     </div>
   );
 
-const applyAllFilters = (activeFilters) => {
+const applyAllFilters = async (activeFilters) => {
   setLoading(true);
   
-  fetchSchedules().then(() => {
-    const filtered = schedules.filter(schedule => {
-      if (activeFilters.type && activeFilters.type !== 'ALL' && 
-          schedule.maintenanceType !== activeFilters.type) {
-        return false;
-      }
-      
-      if (activeFilters.costRange) {
-        const cost = parseFloat(schedule.maintenanceCost);
-        if (activeFilters.costRange.min && cost < parseFloat(activeFilters.costRange.min)) {
-          return false;
-        }
-        if (activeFilters.costRange.max && cost > parseFloat(activeFilters.costRange.max)) {
-          return false;
-        }
-      }
-      
-      if (activeFilters.equipmentId && activeFilters.equipmentId !== 'ALL' && 
-          schedule.equipmentId !== activeFilters.equipmentId) {
-        return false;
-      }
-      
-      if (activeFilters.technician && activeFilters.technician !== 'ALL' && 
-          schedule.technician !== activeFilters.technician) {
-        return false;
-      }
-      
-      if (activeFilters.dateRange && 
-          (activeFilters.dateRange.start || activeFilters.dateRange.end)) {
-        const scheduleDate = new Date(schedule.maintenanceDate);
-        
-        if (activeFilters.dateRange.start) {
-          const startDate = new Date(activeFilters.dateRange.start);
-          if (scheduleDate < startDate) return false;
-        }
-        
-        if (activeFilters.dateRange.end) {
-          const endDate = new Date(activeFilters.dateRange.end);
-          if (scheduleDate > endDate) return false;
-        }
-      }
-      
-      return true;
-    });
+  try {
+    // First fetch all schedules (or filtered by status if needed)
+    let response;
     
-    setSchedules(filtered);
+    if (activeFilters.status === 'ALL') {
+      response = await getMaintenanceSchedule();
+    } else {
+      response = await filterMaintenanceScheduleByStatus(activeFilters.status);
+    }
+    
+    // Get the base data to apply further filtering
+    let filteredData = response.data;
+    
+    // Apply each filter
+    if (activeFilters.type && activeFilters.type !== 'ALL') {
+      // Case-insensitive match for maintenance type
+      filteredData = filteredData.filter(schedule => 
+        schedule.maintenanceType.toUpperCase() === activeFilters.type.toUpperCase()
+      );
+    }
+    
+    if (activeFilters.costRange) {
+      const costMin = activeFilters.costRange.min ? parseFloat(activeFilters.costRange.min) : null;
+      const costMax = activeFilters.costRange.max ? parseFloat(activeFilters.costRange.max) : null;
+      
+      if (costMin !== null) {
+        filteredData = filteredData.filter(schedule => 
+          parseFloat(schedule.maintenanceCost) >= costMin
+        );
+      }
+      
+      if (costMax !== null) {
+        filteredData = filteredData.filter(schedule => 
+          parseFloat(schedule.maintenanceCost) <= costMax
+        );
+      }
+    }
+    
+    if (activeFilters.equipmentId && activeFilters.equipmentId !== 'ALL') {
+      filteredData = filteredData.filter(schedule => 
+        schedule.equipmentId.toString() === activeFilters.equipmentId.toString()
+      );
+    }
+    
+    if (activeFilters.technician && activeFilters.technician !== 'ALL') {
+      filteredData = filteredData.filter(schedule => 
+        schedule.technician === activeFilters.technician
+      );
+    }
+    
+    if (activeFilters.dateRange && 
+        (activeFilters.dateRange.start || activeFilters.dateRange.end)) {
+      
+      if (activeFilters.dateRange.start) {
+        const startDate = new Date(activeFilters.dateRange.start);
+        filteredData = filteredData.filter(schedule => 
+          new Date(schedule.maintenanceDate) >= startDate
+        );
+      }
+      
+      if (activeFilters.dateRange.end) {
+        const endDate = new Date(activeFilters.dateRange.end);
+        filteredData = filteredData.filter(schedule => 
+          new Date(schedule.maintenanceDate) <= endDate
+        );
+      }
+    }
+    
+    setSchedules(filteredData);
+    if (filteredData.length === 0) {
+      showToast('No maintenance schedules match your filters', 'info');
+    }
+  } catch (error) {
+    console.error('Error applying filters:', error);
+    showToast('An error occurred while filtering schedules', 'error');
+  } finally {
     setLoading(false);
-  });
+  }
 };
 
 const resetAllFilters = () => {
+  // Reset all filter states
   setFilters({
     status: 'ALL',
     type: 'ALL',
@@ -425,8 +478,12 @@ const resetAllFilters = () => {
     technician: 'ALL',
     dateRange: { start: null, end: null }
   });
+  
+  // Reset other filter-related states
   setStatusFilter('ALL');
   setSearchTerm('');
+  
+  // Fetch all schedules without filters
   fetchSchedules();
 };
 
@@ -679,22 +736,41 @@ const resetAllFilters = () => {
                     <td className="p-3 border">
                       {editDate.id === schedule.scheduleId ? (
                         <div className="flex gap-2 animate-scaleIn">
-                          <input
-                            type="date"
-                            value={editDate.date}
-                            onChange={(e) => setEditDate({ ...editDate, date: e.target.value })}
-                            className="p-2 border rounded focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all duration-200"
-                          />
+                          <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <input
+                              type="date"
+                              value={editDate.date}
+                              onChange={(e) => setEditDate({ ...editDate, date: e.target.value })}
+                              className="p-2 pl-10 border rounded focus:ring-2 focus:ring-blue-300 focus:border-blue-500 transition-all duration-200"
+                            />
+                          </div>
                           <button
                             onClick={() => handleUpdateDate(schedule.scheduleId)}
-                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 transition-colors duration-300 shadow-sm"
+                            disabled={!editDate.date}
+                            className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 disabled:bg-gray-300 transition-colors duration-300 shadow-sm"
                           >
                             Save
+                          </button>
+                          <button
+                            onClick={() => setEditDate({ id: null, date: '' })}
+                            className="bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition-colors duration-300 shadow-sm"
+                          >
+                            Cancel
                           </button>
                         </div>
                       ) : (
                         <div className="flex justify-between items-center group">
-                          <span>{new Date(schedule.maintenanceDate).toLocaleDateString()}</span>
+                          <div className="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <span>{new Date(schedule.maintenanceDate).toLocaleDateString()}</span>
+                          </div>
                           <button
                             onClick={() => setEditDate({ id: schedule.scheduleId, date: schedule.maintenanceDate.split('T')[0] })}
                             className="opacity-0 group-hover:opacity-100 bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600 transition-all duration-300 shadow-sm"
@@ -778,64 +854,14 @@ const resetAllFilters = () => {
 
         {/* Pagination */}
         {!loading && schedules.length > 0 && (
-          <div className="mt-6 flex flex-col md:flex-row justify-between items-center">
-            <div className="text-sm text-gray-600 mb-4 md:mb-0">
-              Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, schedules.length)} of {schedules.length} items
-            </div>
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-                className={`px-4 py-2 rounded ${currentPage === 1 ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300 shadow-sm hover:shadow transform hover:-translate-y-0.5'}`}
-              >
-                <span className="flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                  Previous
-                </span>
-              </button>
-              <div className="hidden md:flex space-x-2">
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let pageNum;
-                  if (totalPages <= 5) {
-                    pageNum = i + 1;
-                  } else if (currentPage <= 3) {
-                    pageNum = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    pageNum = totalPages - 4 + i;
-                  } else {
-                    pageNum = currentPage - 2 + i;
-                  }
-                  
-                  return (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`w-10 h-10 rounded-full ${currentPage === pageNum 
-                        ? 'bg-blue-600 text-white shadow-md' 
-                        : 'bg-gray-200 hover:bg-gray-300 text-gray-700'} 
-                        transition-all duration-300 transform ${currentPage === pageNum ? 'scale-110' : 'hover:scale-105'}`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-              </div>
-              <button 
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                disabled={currentPage === totalPages}
-                className={`px-4 py-2 rounded ${currentPage === totalPages ? 'bg-gray-200 text-gray-500 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-300 shadow-sm hover:shadow transform hover:-translate-y-0.5'}`}
-              >
-                <span className="flex items-center">
-                  Next
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </span>
-              </button>
-            </div>
-          </div>
+          <Pagination 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            indexOfFirstItem={indexOfFirstItem}
+            indexOfLastItem={indexOfLastItem}
+            totalItems={schedules.length}
+            onPageChange={(page) => setCurrentPage(page)}
+          />
         )}
       </div>
 

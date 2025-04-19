@@ -55,7 +55,11 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
           
           {/* Body */}
           <div className="p-6">
-            <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
+            {typeof message === 'string' ? (
+              <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
+            ) : (
+              message
+            )}
           </div>
           
           {/* Footer */}
