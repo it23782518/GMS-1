@@ -87,12 +87,26 @@ const CostChart = ({
       ctx.font = '10px Arial';
       ctx.fillText('$' + costValue.toFixed(2), x, y - 5);
       
-      // Draw month label
+      // Draw year-month label (YYYY-MM format)
       ctx.fillStyle = '#4A5568';
       ctx.font = '11px Arial';
-      const label = cost.month.substring(5); // Just show month part (MM)
-      ctx.fillText(label, x + barWidth / 2 - 8, height - padding + 15);
+      ctx.textAlign = 'center';
+      const label = cost.month; // Show full YYYY-MM format
+      
+      // Rotate the text if we have more than 6 months to display
+      if (sortedCosts.length > 6) {
+        ctx.save();
+        ctx.translate(x + barWidth / 2, height - padding + 10);
+        ctx.rotate(-Math.PI / 4); // Rotate -45 degrees
+        ctx.fillText(label, 0, 10);
+        ctx.restore();
+      } else {
+        ctx.fillText(label, x + barWidth / 2, height - padding + 15);
+      }
     });
+    
+    // Reset text alignment
+    ctx.textAlign = 'start';
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React, { Fragment, useRef, useEffect } from 'react';
 import { Dialog, Transition } from "@headlessui/react";
 
 const ConfirmationModal = ({ 
@@ -8,6 +8,27 @@ const ConfirmationModal = ({
   modalMessage, 
   handleConfirmAction 
 }) => {
+  const modalRef = useRef(null);
+
+  // Position modal in the viewport when opened
+  useEffect(() => {
+    if (isOpen && modalRef.current) {
+      setTimeout(() => {
+        const viewportHeight = window.innerHeight;
+        const modalHeight = modalRef.current.offsetHeight;
+        const modalRect = modalRef.current.getBoundingClientRect();
+        
+        // Check if modal is partially or completely out of viewport
+        if (modalRect.top < 20 || modalRect.bottom > viewportHeight - 20) {
+          window.scrollTo({
+            top: window.pageYOffset + modalRect.top - (viewportHeight - modalHeight) / 2,
+            behavior: 'auto'
+          });
+        }
+      }, 50);
+    }
+  }, [isOpen]);
+
   return (
     <Transition appear show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -34,7 +55,11 @@ const ConfirmationModal = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel 
+                ref={modalRef}
+                className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all"
+                style={{ maxHeight: 'calc(100vh - 40px)' }}
+              >
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-rose-600 to-rose-400"></div>
                 <div className="mt-3">
                   <Dialog.Title

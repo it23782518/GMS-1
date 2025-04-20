@@ -46,9 +46,27 @@ const Modal = (props) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // Position modal in the visible viewport
+      setTimeout(() => {
+        if (modalRef.current) {
+          const viewportHeight = window.innerHeight;
+          const modalHeight = modalRef.current.offsetHeight;
+          const modalRect = modalRef.current.getBoundingClientRect();
+          
+          // Check if modal is partially or completely out of viewport
+          if (modalRect.top < 20 || modalRect.bottom > viewportHeight - 20) {
+            window.scrollTo({
+              top: window.pageYOffset + modalRect.top - (viewportHeight - modalHeight) / 2,
+              behavior: 'auto' // Use 'auto' to avoid animation
+            });
+          }
+        }
+      }, 50);
     } else {
       document.body.style.overflow = 'auto';
     }
+    
     return () => {
       document.body.style.overflow = 'auto';
     };
@@ -131,6 +149,7 @@ const Modal = (props) => {
           onClick={e => e.stopPropagation()}
           style={{
             animation: 'modalEnterAnimation 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+            maxHeight: 'calc(100vh - 40px)'
           }}
         >
           {/* Modal header */}

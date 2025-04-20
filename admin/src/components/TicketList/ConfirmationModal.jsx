@@ -1,10 +1,32 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirmButtonText = "Confirm" }) => {
-  // Prevent scrolling when modal is open
+  const modalRef = useRef(null);
+  
+  // Prevent scrolling when modal is open and ensure it's visible in the viewport
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
+      
+      // Determine if we need to adjust modal position for visibility
+      const positionModal = () => {
+        if (modalRef.current) {
+          const viewportHeight = window.innerHeight;
+          const modalHeight = modalRef.current.offsetHeight;
+          const modalRect = modalRef.current.getBoundingClientRect();
+          
+          // Check if modal is partially or completely out of viewport
+          if (modalRect.top < 20 || modalRect.bottom > viewportHeight - 20) {
+            window.scrollTo({
+              top: window.pageYOffset + modalRect.top - (viewportHeight - modalHeight) / 2,
+              behavior: 'auto' // Use 'auto' to avoid animation
+            });
+          }
+        }
+      };
+      
+      // Run once after modal is rendered
+      setTimeout(positionModal, 50);
     } else {
       document.body.style.overflow = 'auto';
     }
@@ -25,23 +47,17 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
   
   return (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center backdrop-filter backdrop-blur-[6px] bg-black/30"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-auto bg-black/30 backdrop-filter backdrop-blur-[6px]"
       onClick={handleBackdropClick}
-      style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0
-      }}
     >
-      <div 
-        className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-md w-11/12 md:w-full animate-fadeIn"
-        style={{ maxHeight: '90vh' }}
-      >
-        <div className="bg-white rounded-xl shadow-2xl overflow-auto border border-gray-100 transform transition-all animate-scaleIn">
+      <div className="flex items-center justify-center min-h-screen w-full py-10">
+        <div
+          ref={modalRef}
+          className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-auto my-auto overflow-hidden border border-gray-100 animate-fadeIn"
+          style={{ maxHeight: 'calc(100vh - 40px)' }}
+        >
           {/* Header */}
-          <div className="flex items-center justify-between p-5 border-b border-gray-200">
+          <div className="flex items-center justify-between p-5 border-b border-gray-200 bg-white sticky top-0 z-10">
             <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
             <button
               className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-500 hover:text-gray-700"
@@ -54,7 +70,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
           </div>
           
           {/* Body */}
-          <div className="p-6">
+          <div className="p-6 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 180px)' }}>
             {typeof message === 'string' ? (
               <p className="text-gray-600 text-sm leading-relaxed">{message}</p>
             ) : (
@@ -63,7 +79,7 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
           </div>
           
           {/* Footer */}
-          <div className="flex items-center justify-end p-5 bg-gray-50 border-t border-gray-200">
+          <div className="flex items-center justify-end p-5 bg-gray-50 border-t border-gray-200 sticky bottom-0 z-10">
             <button
               className="px-4 py-2 mr-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-rose-500 transition-colors"
               type="button"
@@ -84,6 +100,16 @@ const ConfirmationModal = ({ isOpen, onClose, onConfirm, title, message, confirm
           </div>
         </div>
       </div>
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.2s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 };

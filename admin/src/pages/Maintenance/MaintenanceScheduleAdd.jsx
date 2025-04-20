@@ -208,7 +208,7 @@ const MaintenanceScheduleAdd = () => {
       });
       
       setTimeout(() => {
-        navigate('/maintenance');
+        navigate('/maintenance-list');
       }, 2000);
     } catch (error) {
       showToast('Error adding maintenance schedule', 'error');

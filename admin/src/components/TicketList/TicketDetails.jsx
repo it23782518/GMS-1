@@ -89,12 +89,6 @@ const TicketDetails = ({
             )}
           </div>
 
-          {/* Status Progress Visualization */}
-          <div className="mt-4 pt-3 border-t border-gray-100">
-            <h5 className="text-sm font-semibold text-gray-700 mb-2">Status Progress:</h5>
-            <StatusChangePreview currentStatus={ticket.status} />
-          </div>
-
           <div className="mt-4 pt-3 border-t border-gray-100">
             <h5 className="text-sm font-semibold text-gray-700 mb-2">Description:</h5>
             <div className="relative">
@@ -110,6 +104,12 @@ const TicketDetails = ({
                 </button>
               )}
             </div>
+          </div>
+
+          {/* Status Progress Visualization */}
+          <div className="mt-4 pt-3 border-t border-gray-100">
+            <h5 className="text-sm font-semibold text-gray-700 mb-2">Status Progress:</h5>
+            <StatusChangePreview currentStatus={ticket.status} />
           </div>
         </div>
 

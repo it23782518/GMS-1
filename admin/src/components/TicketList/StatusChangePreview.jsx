@@ -4,8 +4,6 @@ const StatusChangePreview = ({ currentStatus }) => {
   const statusSteps = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
   const currentIndex = statusSteps.indexOf(currentStatus);
   
-  
-  
   // Special UI for CLOSED status
   if (currentStatus === 'CLOSED') {
     return (
@@ -52,7 +50,24 @@ const StatusChangePreview = ({ currentStatus }) => {
         </div>
       </div>
       
-      <div className="flex justify-between mt-2">
+      {/* Add the connection line positioned in the middle of the circles */}
+      <div className="relative h-10 mt-4">
+        {/* Background gray line */}
+        <div className="absolute top-4 left-5 right-5 h-0.5 bg-gray-200 z-0"></div>
+        {/* Green progress line */}
+        <div 
+          className="absolute top-4 left-5 h-0.5 bg-green-500 z-0 transition-all duration-500"
+          style={{ 
+            width: currentIndex === 0 
+              ? '0%' 
+              : currentIndex === 1 
+                ? 'calc(50% - 10px)' 
+                : 'calc(100% - 20px)' 
+          }}
+        ></div>
+      </div>
+      
+      <div className="flex justify-between relative z-10 -mt-10">
         {['OPEN', 'IN_PROGRESS', 'RESOLVED'].map((status, index) => {
           const isActive = index <= currentIndex;
           const isCurrent = status === currentStatus;
@@ -66,6 +81,7 @@ const StatusChangePreview = ({ currentStatus }) => {
                   : 'bg-gray-200 text-gray-400'
                 }
                 ${isCurrent ? 'ring-4 ring-green-100' : ''}
+                z-20 relative
               `}>
                 {index === 0 && (
                   <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -86,10 +102,6 @@ const StatusChangePreview = ({ currentStatus }) => {
               <span className={`text-xs font-medium mt-1 ${isActive ? 'text-gray-700' : 'text-gray-400'}`}>
                 {status.replace('_', ' ')}
               </span>
-              {index < 2 && (
-                <div className={`w-8 h-0.5 ${index < currentIndex ? 'bg-green-500' : 'bg-gray-200'} absolute left-0 right-0 mx-auto`} 
-                     style={{transform: `translateX(${(index + 1) * 100}%)`}}></div>
-              )}
             </div>
           );
         })}

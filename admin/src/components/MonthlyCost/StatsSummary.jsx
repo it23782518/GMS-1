@@ -15,7 +15,7 @@ const StatsSummary = ({
         <div className="flex items-start">
           <div>
             <p className="text-blue-100 text-sm">Yearly Total</p>
-            <p className="text-2xl font-bold mt-1">${getYearlyTotal().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl font-bold mt-1">Rs{getYearlyTotal().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-blue-100 mt-2">All months combined</p>
           </div>
           <div className="ml-auto bg-white bg-opacity-20 p-2 rounded-lg">
@@ -32,7 +32,7 @@ const StatsSummary = ({
         <div className="flex items-start">
           <div>
             <p className="text-indigo-100 text-sm">Monthly Average</p>
-            <p className="text-2xl font-bold mt-1">${getMonthlyAverage().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl font-bold mt-1">Rs{getMonthlyAverage().toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-indigo-100 mt-2">Average spend per month</p>
           </div>
           <div className="ml-auto bg-white bg-opacity-20 p-2 rounded-lg">
@@ -49,7 +49,7 @@ const StatsSummary = ({
         <div className="flex items-start">
           <div>
             <p className="text-orange-100 text-sm">Highest Monthly Cost</p>
-            <p className="text-2xl font-bold mt-1">${getHighestCost().cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl font-bold mt-1">Rs{getHighestCost().cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-orange-100 mt-2">{getMonthName(getHighestCost().month)} {getHighestCost().month?.split('-')[0]}</p>
           </div>
           <div className="ml-auto bg-white bg-opacity-20 p-2 rounded-lg">
@@ -66,7 +66,7 @@ const StatsSummary = ({
         <div className="flex items-start">
           <div>
             <p className="text-green-100 text-sm">Lowest Monthly Cost</p>
-            <p className="text-2xl font-bold mt-1">${getLowestCost().cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+            <p className="text-2xl font-bold mt-1">Rs{getLowestCost().cost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
             <p className="text-xs text-green-100 mt-2">{getMonthName(getLowestCost().month)} {getLowestCost().month?.split('-')[0]}</p>
           </div>
           <div className="ml-auto bg-white bg-opacity-20 p-2 rounded-lg">

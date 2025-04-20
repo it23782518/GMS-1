@@ -69,9 +69,9 @@ const EquipmentPage = () => {
             </Link>
             
             <Link 
-              to="/maintenance" 
+              to="/maintenance-list" 
               className={`px-4 sm:px-5 md:px-7 py-3 md:py-4 text-sm font-medium flex items-center transition-all duration-300 group ${
-                currentPath === '/maintenance' 
+                currentPath === '/maintenance-list' 
                   ? 'bg-gradient-to-r from-rose-700 to-rose-500 text-white shadow-md'
                   : 'text-gray-700 hover:bg-rose-50 hover:text-rose-700'
               }`}
@@ -135,8 +135,8 @@ const EquipmentPage = () => {
           <Routes>
             <Route path="/equipment-list" element={<EquipmentList />} />
             <Route path="/add-equipment" element={<AddEquipmentForm />} />
-            <Route path="/maintenance" element={<div>{<MaintenanceScheduleList />}</div>} />
-            <Route path="/maintenance-list" element={<div>{<MaintenanceScheduleAdd />}</div>} />
+            <Route path="/maintenance-list" element={<div>{<MaintenanceScheduleList />}</div>} />
+            <Route path="/maintenance-add" element={<div>{<MaintenanceScheduleAdd />}</div>} />
             <Route path="/maintenance-cost" element={<div>{<MonthlyCostViewer />}</div>} />
             <Route path="/tickets" element={<div>{<TicketsPage />}</div>} />
             <Route path="/raise-ticket" element={<div>{<AddTicketForm />}</div>} />
