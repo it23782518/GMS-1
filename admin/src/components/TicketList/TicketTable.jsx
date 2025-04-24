@@ -15,6 +15,29 @@ const TicketTable = ({
   formatDate,
   getTicketId
 }) => {
+  const formatDateOnly = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString();
+    } catch (e) {
+      return dateString;
+    }
+  };
+
+  const getPriorityBadge = (priority) => {
+    switch(priority) {
+      case 'HIGH':
+        return 'bg-red-100 text-red-800';
+      case 'MEDIUM':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'LOW':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
   return (
     <div className="hidden md:block overflow-x-auto rounded-lg mb-0">
       <table className="w-full text-sm text-left text-gray-700">
@@ -23,6 +46,7 @@ const TicketTable = ({
             <th className="px-6 py-4 font-semibold">ID</th>
             <th className="px-6 py-4 font-semibold">Type</th>
             <th className="px-6 py-4 font-semibold">Status</th>
+            <th className="px-6 py-4 font-semibold">Priority</th>
             <th className="px-6 py-4 font-semibold">Created</th>
             <th className="px-6 py-4 font-semibold">Actions</th>
           </tr>
@@ -41,7 +65,12 @@ const TicketTable = ({
                   <td className="px-6 py-4">
                     <StatusBadge status={ticket.status} />
                   </td>
-                  <td className="px-6 py-4">{formatDate(ticket.createdAt)}</td>
+                  <td className="px-6 py-4">
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${getPriorityBadge(ticket.priority)}`}>
+                      {ticket.priority}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">{formatDateOnly(ticket.createdAt)}</td>
                   <td className="px-6 py-4">
                     <button
                       onClick={() => setExpandedTicket(expandedTicket === getTicketId(ticket) ? null : getTicketId(ticket))}
@@ -67,7 +96,7 @@ const TicketTable = ({
                 </tr>
                 {expandedTicket === getTicketId(ticket) && (
                   <tr>
-                    <td colSpan="5" className="px-0 py-0 border-b">
+                    <td colSpan="6" className="px-0 py-0 border-b">
                       <TicketDetails 
                         ticket={ticket}
                         handleStatusChange={handleStatusChange}
@@ -85,7 +114,7 @@ const TicketTable = ({
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="text-center py-12">
+              <td colSpan="6" className="text-center py-12">
                 <div className="flex flex-col items-center justify-center">
                   <div className="bg-gray-100 p-5 rounded-full mb-4">
                     <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

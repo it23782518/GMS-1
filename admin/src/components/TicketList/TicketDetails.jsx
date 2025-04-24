@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import StatusBadge from './StatusBadge';
 import StatusChangePreview from './StatusChangePreview';
 
-// Helper function moved directly into component
 const getAssignedToInfo = (ticket) => {
   if (!ticket.assignedToId && !ticket.assignedToName) {
     return 'Not assigned';
@@ -28,7 +27,6 @@ const TicketDetails = ({
   const [localStatus, setLocalStatus] = useState("");
 
   useEffect(() => {
-    // Reset local status when the ticket's selected status changes
     setLocalStatus(selectedStatuses[getTicketId(ticket)] || "");
   }, [selectedStatuses, getTicketId, ticket]);
 
@@ -40,7 +38,6 @@ const TicketDetails = ({
     ? `${ticket.description.substring(0, 150)}...` 
     : ticket.description;
 
-  // Handle local status change
   const onStatusChange = (e) => {
     const newStatus = e.target.value;
     setLocalStatus(newStatus);

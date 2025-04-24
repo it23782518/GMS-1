@@ -5,9 +5,9 @@ import AddEquipmentForm from "./Equipment/AddEquipmentForm";
 import Header from "../components/header";
 import Footer from "../components/Footer";
 import MaintenanceScheduleList from "./Maintenance/MaintenanceScheduleList";
-import MaintenanceScheduleAdd from "./Maintenance/MaintenanceScheduleAdd";
+import MaintenanceScheduleAdd from "./Maintenance/AddMaintenanceSchedule";
 import MonthlyCostViewer from "./MonthlyCost/MonthlyCostViewer";
-import TicketsPage from "./TicketsPage";
+import TicketList from "./Tickets/TicketList";
 import AddTicketForm from "./Tickets/AddTicketForm";
 
 const EquipmentPage = () => {
@@ -138,7 +138,7 @@ const EquipmentPage = () => {
             <Route path="/maintenance-list" element={<div>{<MaintenanceScheduleList />}</div>} />
             <Route path="/maintenance-add" element={<div>{<MaintenanceScheduleAdd />}</div>} />
             <Route path="/maintenance-cost" element={<div>{<MonthlyCostViewer />}</div>} />
-            <Route path="/tickets" element={<div>{<TicketsPage />}</div>} />
+            <Route path="/tickets" element={<div>{<TicketList />}</div>} />
             <Route path="/raise-ticket" element={<div>{<AddTicketForm />}</div>} />
             <Route path="/" element={<Navigate to="/equipment-list" replace />} />
             

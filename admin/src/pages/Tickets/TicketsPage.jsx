@@ -1,12 +1,10 @@
-// src/pages/TicketsPage.jsx
 import React, { useState, useEffect } from 'react';
 import {
   getAllTickets,
-  searchTicketsById,
-  searchTicketsByStaffId,
-} from '../services/api';
-import AddTicketForm from './Tickets/AddTicketForm';
-import TicketList from './Tickets/TicketList';
+
+} from '../../services/api';
+import AddTicketForm from './AddTicketForm';
+import TicketList from './TicketList';
 
 const TicketsPage = () => {
   const [tickets, setTickets] = useState([]);
@@ -43,7 +41,6 @@ const TicketsPage = () => {
           />
         ) : (
           <>
-            {/* Removed the Create New Ticket button that was here */}
 
             {error && (
               <div className="mb-6 text-rose-600 p-4 bg-rose-50 border-l-4 border-rose-600 rounded-md flex items-start">

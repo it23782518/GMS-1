@@ -12,6 +12,10 @@ export const getEquipment = async () => {
   return axios.get(`${BASE_URL}/api/equipment`);
 };
 
+export const getEquipmentWithDeleted = async () => {
+  return axios.get(`${BASE_URL}/api/equipment/get-all`);
+}
+
 export const getEquipmentById = async (id) => {
   return axios.get(`${BASE_URL}/api/equipment/${id}`);
 };
@@ -32,7 +36,7 @@ export const updateEquipmentMaintenanceDate = async (id, maintenanceDate) => {
   return axios.put(`${BASE_URL}/api/equipment/${id}/Maintenance?maintenanceDate=${maintenanceDate}`);
 };
 
-export const searchEquipmentByName = async (search) => {
+export const searchEquipment = async (search) => {
   return axios.get(`${BASE_URL}/api/equipment/search?Search=${search}`);
 }
 
@@ -84,6 +88,14 @@ export const updateMaintenanceDescription = async (id, description) => {
 
 export const filterMaintenanceScheduleByStatus = async (status) => {
   return axios.get(`${BASE_URL}/api/maintenance-schedule/filter-by-status?status=${status}`);
+}
+
+export const filterMaintenanceScheduleByType = async (type) => {
+  return axios.get(`${BASE_URL}/api/maintenance-schedule/filter-by-type?type=${type}`);
+}
+
+export const filterMaintenanceScheduleByEquipmentId = async (equipmentId) => {
+  return axios.get(`${BASE_URL}/api/maintenance-schedule/filter-by-equipmentId?equipmentId=${equipmentId}`);
 }
 
 // Monthly Maintenance Cost API

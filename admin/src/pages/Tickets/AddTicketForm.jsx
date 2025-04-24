@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { addTicket } from '../../services/api';
 import { useNavigate } from 'react-router-dom';
 
-// Import components
 import Header from '../../components/AddTicket/Header';
 import AlertMessage from '../../components/AddTicket/AlertMessage';
 import TicketTypeForm from '../../components/AddTicket/TicketTypeForm';
@@ -14,10 +13,10 @@ const AddTicketFormPage = () => {
   const [ticketData, setTicketData] = useState({
     type: '',
     description: '',
-    priority: 'MEDIUM', // Default value
+    priority: 'MEDIUM',
     staffId: '',
     userId: '',
-    assigneeType: 'STAFF' // Default value - new field
+    assigneeType: 'STAFF'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -29,7 +28,6 @@ const AddTicketFormPage = () => {
     setError(null);
     
     try {
-      // Prepare data based on assigneeType
       const dataToSubmit = {
         ...ticketData,
         staffId: ticketData.assigneeType === 'STAFF' && ticketData.staffId ? 
@@ -50,7 +48,6 @@ const AddTicketFormPage = () => {
         assigneeType: 'STAFF' 
       });
       
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate('/tickets');
       }, 2000);

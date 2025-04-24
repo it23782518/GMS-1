@@ -1,7 +1,6 @@
 import React from 'react';
 import StatusBadge from './StatusBadge';
 
-// Helper function moved directly into component
 const getAssignedToInfo = (ticket) => {
   if (!ticket.assignedToId && !ticket.assignedToName) {
     return 'Not assigned';

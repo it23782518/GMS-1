@@ -4,38 +4,55 @@ import {
   updateTicketStatus, 
   filterTicketsByStatus, 
   filterTicketsByPriority,
-  searchTicketsById,
-  searchTicketsByStaffId
+  getAllTickets
 } from '../../services/api';
-import { Link } from 'react-router-dom';
-import ConfirmationModal from '../../components/TicketList/ConfirmationModal';
+import Modal from '../../components/Modal';
 import StatusChangePreview from '../../components/TicketList/StatusChangePreview';
-
-// Import our component files
-import StatusBadge from '../../components/TicketList/StatusBadge';
 import FilterButtons from '../../components/TicketList/FilterButtons';
-import SearchComponent from '../../components/TicketList/SearchComponent';
 import TicketTable from '../../components/TicketList/TicketTable';
 import MobileTicketCard from '../../components/TicketList/MobileTicketCard';
+import AddTicketForm from './AddTicketForm';
 
-const TicketList = ({ tickets: initialTickets, onUpdate }) => {
+const TicketList = () => {
   const [expandedTicket, setExpandedTicket] = useState(null);
   const [selectedStatuses, setSelectedStatuses] = useState({});
   const [loading, setLoading] = useState(false);
   const [tickets, setTickets] = useState([]);
+  const [initialTickets, setInitialTickets] = useState([]);
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchBy, setSearchBy] = useState('ticketId'); // 'ticketId' or 'staffId'
-  
-  // Modal state
+  const [error, setError] = useState(null);
+  const [showAddForm, setShowAddForm] = useState(false);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalMessage, setModalMessage] = useState('');
   const [modalAction, setModalAction] = useState(null);
   const [modalConfirmText, setModalConfirmText] = useState('Confirm');
+  const [modalType, setModalType] = useState('info');
 
-  // Helper functions directly in the component
+  useEffect(() => {
+    fetchTickets();
+  }, []);
+
+  const fetchTickets = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getAllTickets();
+      const ticketData = Array.isArray(response.data) ? response.data : [];
+      setTickets(ticketData);
+      setInitialTickets(ticketData);
+    } catch (error) {
+      console.error('Error fetching tickets:', error);
+      setError('Failed to load tickets. Please try again later.');
+      setTickets([]);
+      setInitialTickets([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     
@@ -68,7 +85,6 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     return `${name} (Staff ID: ${id})`;
   };
 
-  // Calculate status counts for filter badges
   const getStatusCounts = () => {
     const counts = {
       ALL: initialTickets?.length || 0,
@@ -87,7 +103,6 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     return counts;
   };
   
-  // Calculate priority counts for filter badges
   const getPriorityCounts = () => {
     const counts = {
       ALL: initialTickets?.length || 0,
@@ -104,39 +119,26 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     
     return counts;
   };
-  
-  const statusCounts = getStatusCounts();
-  const priorityCounts = getPriorityCounts();
 
-  // Initialize tickets from props
-  useEffect(() => {
-    setTickets(initialTickets);
-  }, [initialTickets]);
-
-  // Apply filters when they change
   useEffect(() => {
     applyFilters();
-  }, [statusFilter, priorityFilter]);
+  }, [statusFilter, priorityFilter, initialTickets]);
 
-  // Apply filters function
   const applyFilters = async () => {
     setLoading(true);
     try {
       let filteredTickets = [...initialTickets];
       
-      // Apply status filter
       if (statusFilter !== 'ALL') {
         const response = await filterTicketsByStatus(statusFilter);
         filteredTickets = response.data;
       }
       
-      // Apply priority filter on top of status filter if both are active
       if (priorityFilter !== 'ALL') {
         if (statusFilter === 'ALL') {
           const response = await filterTicketsByPriority(priorityFilter);
           filteredTickets = response.data;
         } else {
-          // If already filtered by status, apply client-side filtering for priority
           filteredTickets = filteredTickets.filter(ticket => ticket.priority === priorityFilter);
         }
       }
@@ -149,67 +151,24 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
     }
   };
 
-  // Search function
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      setTickets(initialTickets);
-      return;
-    }
-
-    setLoading(true);
-    try {
-      let response;
-      if (searchBy === 'ticketId') {
-        response = await searchTicketsById(searchTerm);
-      } else if (searchBy === 'staffId') {
-        response = await searchTicketsByStaffId(searchTerm);
-      }
-
-      if (response && response.data) {
-        // Ensure each ticket has a status property
-        const processedTickets = Array.isArray(response.data) ? response.data : [response.data];
-        
-        // Make sure each ticket has at least the required properties to prevent errors
-        const validTickets = processedTickets.map(ticket => ({
-          ...ticket,
-          status: ticket.status || 'UNKNOWN',
-          priority: ticket.priority || 'UNKNOWN',
-          type: ticket.type || 'UNKNOWN',
-          createdAt: ticket.createdAt || new Date().toISOString()
-        }));
-        
-        setTickets(validTickets);
-      } else {
-        setTickets([]);
-      }
-    } catch (error) {
-      console.error('Error searching tickets:', error);
-      setTickets([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Reset filters
   const resetFilters = () => {
     setStatusFilter('ALL');
     setPriorityFilter('ALL');
     setTickets(initialTickets);
   };
 
-  // Reset all
   const resetAll = () => {
     setStatusFilter('ALL');
     setPriorityFilter('ALL');
-    setSearchTerm('');
     setTickets(initialTickets);
   };
 
-  const showConfirmationModal = (title, message, action, confirmText = 'Confirm') => {
+  const showConfirmationModal = (title, message, action, confirmText = 'Confirm', type = 'warning') => {
     setModalTitle(title);
     setModalMessage(message);
     setModalAction(() => action);
     setModalConfirmText(confirmText);
+    setModalType(type);
     setModalOpen(true);
   };
 
@@ -223,14 +182,15 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
         try {
           setLoading(true);
           await assignTicket(ticketId, staffId);
-          onUpdate();
+          fetchTickets();
         } catch (error) {
           console.error('Error assigning ticket:', error);
         } finally {
           setLoading(false);
         }
       },
-      'Assign Ticket'
+      'Assign Ticket',
+      'warning'
     );
   };
 
@@ -257,121 +217,145 @@ const TicketList = ({ tickets: initialTickets, onUpdate }) => {
         try {
           setLoading(true);
           await updateTicketStatus(ticketId, status);
-          onUpdate();
+          fetchTickets();
         } catch (error) {
           console.error('Error updating status:', error);
         } finally {
           setLoading(false);
         }
       },
-      'Update Status'
+      'Update Status',
+      'warning'
     );
   };
 
   return (
-    <div className="bg-gray-50 py-6 rounded-lg">
+    <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-rose-700 to-rose-500 p-6 flex flex-col sm:flex-row justify-between items-center">
-            <div className="flex items-center mb-4 sm:mb-0">
-              <div className="bg-white bg-opacity-30 p-2 rounded-lg mr-3 shadow-inner">
-                <svg className="w-6 h-6 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+        {showAddForm ? (
+          <AddTicketForm
+            onClose={() => setShowAddForm(false)}
+            onTicketAdded={fetchTickets}
+          />
+        ) : (
+          <>
+            <div className="mb-6 flex justify-between items-center">
+              <h1 className="text-2xl font-bold text-gray-800">Support Tickets</h1>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow flex items-center transition-colors duration-200"
+              >
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                 </svg>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
-                Tickets
-              </h1>
+                Add New Ticket
+              </button>
             </div>
-            <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white border-opacity-20">
-              <svg className="w-5 h-5 text-red opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-              </svg>
-              <span className="text-red font-medium">Total: {initialTickets?.length || 0} tickets</span>
-            </div>
-          </div>
 
-          {/* Status Filter Buttons */}
-          <FilterButtons 
-            type="status" 
-            currentFilter={statusFilter} 
-            setFilter={setStatusFilter} 
-            counts={statusCounts} 
-          />
-
-          {/* Priority Filter Buttons */}
-          <FilterButtons 
-            type="priority" 
-            currentFilter={priorityFilter} 
-            setFilter={setPriorityFilter} 
-            counts={priorityCounts} 
-          />
-
-          {/* Search Component */}
-          <SearchComponent
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            searchBy={searchBy}
-            setSearchBy={setSearchBy}
-            handleSearch={handleSearch}
-            resetAll={resetAll}
-            loading={loading}
-          />
-
-          {/* Loading indicator */}
-          {loading && (
-            <div className="p-4 flex justify-center">
-              <div className="flex items-center">
-                <svg className="animate-spin h-5 w-5 mr-3 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            {error && (
+              <div className="mb-6 text-rose-600 p-4 bg-rose-50 border-l-4 border-rose-600 rounded-md flex items-start">
+                <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
-                <span>Loading tickets...</span>
+                <span>{error}</span>
               </div>
+            )}
+            
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+              {/* Header */}
+              <div className="bg-gradient-to-r from-rose-700 to-rose-500 p-6 flex flex-col sm:flex-row justify-between items-center">
+                <div className="flex items-center mb-4 sm:mb-0">
+                  <div className="bg-white bg-opacity-30 p-2 rounded-lg mr-3 shadow-inner">
+                    <svg className="w-6 h-6 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                    </svg>
+                  </div>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
+                    Tickets
+                  </h1>
+                </div>
+                <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white border-opacity-20">
+                  <svg className="w-5 h-5 text-red opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                  </svg>
+                  <span className="text-red font-medium">Total: {initialTickets?.length || 0} tickets</span>
+                </div>
+              </div>
+
+              {/* Status Filter Buttons */}
+              <FilterButtons 
+                type="status" 
+                currentFilter={statusFilter} 
+                setFilter={setStatusFilter} 
+                counts={getStatusCounts()} 
+              />
+
+              {/* Priority Filter Buttons */}
+              <FilterButtons 
+                type="priority" 
+                currentFilter={priorityFilter} 
+                setFilter={setPriorityFilter} 
+                counts={getPriorityCounts()} 
+              />
+
+              {/* Loading indicator */}
+              {loading && (
+                <div className="p-4 flex justify-center">
+                  <div className="flex items-center">
+                    <svg className="animate-spin h-5 w-5 mr-3 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Loading tickets...</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Desktop Table View */}
+              <TicketTable
+                tickets={tickets}
+                expandedTicket={expandedTicket}
+                setExpandedTicket={setExpandedTicket}
+                handleStatusChange={handleStatusChange}
+                handleUpdateStatus={handleUpdateStatus}
+                handleAssignTicket={handleAssignTicket}
+                selectedStatuses={selectedStatuses}
+                loading={loading}
+                resetFilters={resetFilters}
+                formatDate={formatDate}
+                getTicketId={getTicketId}
+              />
+
+              {/* Mobile Card View */}
+              <MobileTicketCard
+                tickets={tickets}
+                expandedTicket={expandedTicket}
+                setExpandedTicket={setExpandedTicket}
+                handleStatusChange={handleStatusChange}
+                handleUpdateStatus={handleUpdateStatus}
+                handleAssignTicket={handleAssignTicket}
+                selectedStatuses={selectedStatuses}
+                loading={loading}
+                resetFilters={resetFilters}
+                formatDate={formatDate}
+                getTicketId={getTicketId}
+              />
             </div>
-          )}
-
-          {/* Desktop Table View */}
-          <TicketTable
-            tickets={tickets}
-            expandedTicket={expandedTicket}
-            setExpandedTicket={setExpandedTicket}
-            handleStatusChange={handleStatusChange}
-            handleUpdateStatus={handleUpdateStatus}
-            handleAssignTicket={handleAssignTicket}
-            selectedStatuses={selectedStatuses}
-            loading={loading}
-            resetFilters={resetFilters}
-            formatDate={formatDate}
-            getTicketId={getTicketId}
-          />
-
-          {/* Mobile Card View */}
-          <MobileTicketCard
-            tickets={tickets}
-            expandedTicket={expandedTicket}
-            setExpandedTicket={setExpandedTicket}
-            handleStatusChange={handleStatusChange}
-            handleUpdateStatus={handleUpdateStatus}
-            handleAssignTicket={handleAssignTicket}
-            selectedStatuses={selectedStatuses}
-            loading={loading}
-            resetFilters={resetFilters}
-            formatDate={formatDate}
-            getTicketId={getTicketId}
-          />
-        </div>
+          </>
+        )}
       </div>
 
-      {/* Add ConfirmationModal component */}
-      <ConfirmationModal
+      {/* Modal */}
+      <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={modalAction}
         title={modalTitle}
         message={modalMessage}
-        confirmButtonText={modalConfirmText}
+        confirmText={modalConfirmText}
+        type={modalType}
+        size="md"
+        showCancel={true}
       />
     </div>
   );

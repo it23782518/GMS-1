@@ -15,4 +15,8 @@ public interface MaintenanceScheduleRepository extends JpaRepository<Maintenance
     List<MaintenanceSchedule> findByMaintenanceTypeContainingIgnoreCase(String search);
 
     List<MaintenanceSchedule> findByStatus(MaintenanceStatus maintenanceStatus);
-}
+
+    List<MaintenanceSchedule> findByEquipmentId(Long equipmentId);
+
+    @Query("SELECT m FROM MaintenanceSchedule m WHERE m.maintenanceCost IS NOT NULL")
+    List<MaintenanceSchedule> findAllAndMaintenanceCostNotNull();}
