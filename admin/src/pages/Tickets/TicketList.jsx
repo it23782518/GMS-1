@@ -11,7 +11,6 @@ import StatusChangePreview from '../../components/TicketList/StatusChangePreview
 import FilterButtons from '../../components/TicketList/FilterButtons';
 import TicketTable from '../../components/TicketList/TicketTable';
 import MobileTicketCard from '../../components/TicketList/MobileTicketCard';
-import AddTicketForm from './AddTicketForm';
 
 const TicketList = () => {
   const [expandedTicket, setExpandedTicket] = useState(null);
@@ -22,7 +21,6 @@ const TicketList = () => {
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [priorityFilter, setPriorityFilter] = useState('ALL');
   const [error, setError] = useState(null);
-  const [showAddForm, setShowAddForm] = useState(false);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
@@ -232,117 +230,97 @@ const TicketList = () => {
   return (
     <div className="bg-gray-50 min-h-screen py-8">
       <div className="container mx-auto px-4 max-w-7xl">
-        {showAddForm ? (
-          <AddTicketForm
-            onClose={() => setShowAddForm(false)}
-            onTicketAdded={fetchTickets}
-          />
-        ) : (
-          <>
-            <div className="mb-6 flex justify-between items-center">
-              <h1 className="text-2xl font-bold text-gray-800">Support Tickets</h1>
-              <button
-                onClick={() => setShowAddForm(true)}
-                className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow flex items-center transition-colors duration-200"
-              >
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-                Add New Ticket
-              </button>
-            </div>
+        
 
-            {error && (
-              <div className="mb-6 text-rose-600 p-4 bg-rose-50 border-l-4 border-rose-600 rounded-md flex items-start">
-                <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
-            
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-rose-700 to-rose-500 p-6 flex flex-col sm:flex-row justify-between items-center">
-                <div className="flex items-center mb-4 sm:mb-0">
-                  <div className="bg-white bg-opacity-30 p-2 rounded-lg mr-3 shadow-inner">
-                    <svg className="w-6 h-6 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
-                    </svg>
-                  </div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
-                    Tickets
-                  </h1>
-                </div>
-                <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white border-opacity-20">
-                  <svg className="w-5 h-5 text-red opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
-                  </svg>
-                  <span className="text-red font-medium">Total: {initialTickets?.length || 0} tickets</span>
-                </div>
-              </div>
-
-              {/* Status Filter Buttons */}
-              <FilterButtons 
-                type="status" 
-                currentFilter={statusFilter} 
-                setFilter={setStatusFilter} 
-                counts={getStatusCounts()} 
-              />
-
-              {/* Priority Filter Buttons */}
-              <FilterButtons 
-                type="priority" 
-                currentFilter={priorityFilter} 
-                setFilter={setPriorityFilter} 
-                counts={getPriorityCounts()} 
-              />
-
-              {/* Loading indicator */}
-              {loading && (
-                <div className="p-4 flex justify-center">
-                  <div className="flex items-center">
-                    <svg className="animate-spin h-5 w-5 mr-3 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Loading tickets...</span>
-                  </div>
-                </div>
-              )}
-
-              {/* Desktop Table View */}
-              <TicketTable
-                tickets={tickets}
-                expandedTicket={expandedTicket}
-                setExpandedTicket={setExpandedTicket}
-                handleStatusChange={handleStatusChange}
-                handleUpdateStatus={handleUpdateStatus}
-                handleAssignTicket={handleAssignTicket}
-                selectedStatuses={selectedStatuses}
-                loading={loading}
-                resetFilters={resetFilters}
-                formatDate={formatDate}
-                getTicketId={getTicketId}
-              />
-
-              {/* Mobile Card View */}
-              <MobileTicketCard
-                tickets={tickets}
-                expandedTicket={expandedTicket}
-                setExpandedTicket={setExpandedTicket}
-                handleStatusChange={handleStatusChange}
-                handleUpdateStatus={handleUpdateStatus}
-                handleAssignTicket={handleAssignTicket}
-                selectedStatuses={selectedStatuses}
-                loading={loading}
-                resetFilters={resetFilters}
-                formatDate={formatDate}
-                getTicketId={getTicketId}
-              />
-            </div>
-          </>
+        {error && (
+          <div className="mb-6 text-rose-600 p-4 bg-rose-50 border-l-4 border-rose-600 rounded-md flex items-start">
+            <svg className="w-5 h-5 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <span>{error}</span>
+          </div>
         )}
+        
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+          {/* Header */}
+          <div className="bg-gradient-to-r from-rose-700 to-rose-500 p-6 flex flex-col sm:flex-row justify-between items-center">
+            <div className="flex items-center mb-4 sm:mb-0">
+              <div className="bg-white bg-opacity-30 p-2 rounded-lg mr-3 shadow-inner">
+                <svg className="w-6 h-6 text-red" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+                </svg>
+              </div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white drop-shadow-sm">
+                Tickets
+              </h1>
+            </div>
+            <div className="flex items-center bg-white bg-opacity-10 backdrop-blur-sm px-4 py-2 rounded-lg border border-white border-opacity-20">
+              <svg className="w-5 h-5 text-red opacity-80 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+              </svg>
+              <span className="text-red font-medium">Total: {initialTickets?.length || 0} tickets</span>
+            </div>
+          </div>
+
+          {/* Status Filter Buttons */}
+          <FilterButtons 
+            type="status" 
+            currentFilter={statusFilter} 
+            setFilter={setStatusFilter} 
+            counts={getStatusCounts()} 
+          />
+
+          {/* Priority Filter Buttons */}
+          <FilterButtons 
+            type="priority" 
+            currentFilter={priorityFilter} 
+            setFilter={setPriorityFilter} 
+            counts={getPriorityCounts()} 
+          />
+
+          {/* Loading indicator */}
+          {loading && (
+            <div className="p-4 flex justify-center">
+              <div className="flex items-center">
+                <svg className="animate-spin h-5 w-5 mr-3 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Loading tickets...</span>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop Table View */}
+          <TicketTable
+            tickets={tickets}
+            expandedTicket={expandedTicket}
+            setExpandedTicket={setExpandedTicket}
+            handleStatusChange={handleStatusChange}
+            handleUpdateStatus={handleUpdateStatus}
+            handleAssignTicket={handleAssignTicket}
+            selectedStatuses={selectedStatuses}
+            loading={loading}
+            resetFilters={resetFilters}
+            formatDate={formatDate}
+            getTicketId={getTicketId}
+          />
+
+          {/* Mobile Card View */}
+          <MobileTicketCard
+            tickets={tickets}
+            expandedTicket={expandedTicket}
+            setExpandedTicket={setExpandedTicket}
+            handleStatusChange={handleStatusChange}
+            handleUpdateStatus={handleUpdateStatus}
+            handleAssignTicket={handleAssignTicket}
+            selectedStatuses={selectedStatuses}
+            loading={loading}
+            resetFilters={resetFilters}
+            formatDate={formatDate}
+            getTicketId={getTicketId}
+          />
+        </div>
       </div>
 
       {/* Modal */}

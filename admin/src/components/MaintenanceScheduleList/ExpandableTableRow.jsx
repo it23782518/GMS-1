@@ -114,11 +114,10 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
               
               <div className="p-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Left Column: Status and Equipment Information */}
                   <div className="space-y-4">
                     <h4 className="font-medium text-gray-800">Maintenance Details</h4>
                     
-                    {/* Status Section - Show edit button only if equipment is not deleted */}
+                    {/* Status Section*/}
                     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                       <div className="flex justify-between items-center mb-3">
                         <div className="flex items-center">
@@ -145,7 +144,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                       </div>
                     </div>
 
-                    {/* Equipment Information Section - Updated for deleted equipment */}
+                    {/* Equipment Information Section*/}
                     <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
                       <h5 className="text-sm font-medium text-gray-700 mb-3">Equipment Information</h5>
                       
@@ -156,7 +155,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                         </div>
                       ) : (
                         <div className="divide-y divide-gray-100">
-                          {/* Basic Information - Hide ID for deleted equipment */}
+                          {/* Basic Information*/}
                           <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm py-2">
                             {!isEquipmentDeleted() && (
                               <div className="flex flex-col">
@@ -209,7 +208,6 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                                   </div>
                                 </div>
 
-                                {/* Only display warranty if equipment is not deleted */}
                                 {!equipment.deleted && (
                                   <div className="grid grid-cols-1 gap-y-2 text-sm py-2">
                                     <div className="flex flex-col">
@@ -219,7 +217,6 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                                   </div>
                                 )}
                                 
-                                {/* Show prominent "No longer available" message for deleted equipment */}
                                 {equipment.deleted && (
                                   <div className="mt-4 pt-2 border-t border-red-100">
                                     <div className="bg-red-50 border border-red-200 rounded-md p-3 text-center">
@@ -240,7 +237,6 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                     </div>
                   </div>
                   
-                  {/* Right Column: Maintenance Type, Date, Cost, Technician, Description */}
                   <div className="space-y-4">
                     {/* Maintenance Type Section */}
                     <div className="flex justify-between items-center">
@@ -251,7 +247,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                       <p className="text-gray-700 font-medium">{schedule.maintenanceType}</p>
                     </div>
                     
-                    {/* Maintenance Date Section - Hide edit button if equipment is deleted */}
+                    {/* Maintenance Date Section*/}
                     <div className="flex justify-between items-center">
                       <h4 className="font-medium text-gray-800">Date</h4>
                       {!isEquipmentDeleted() && (
@@ -271,7 +267,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                       <p className="text-gray-700">{new Date(schedule.maintenanceDate).toLocaleDateString()}</p>
                     </div>
                     
-                    {/* Maintenance Cost Section - Hide edit button if equipment is deleted */}
+                    {/* Maintenance Cost Section*/}
                     <div className="flex justify-between items-center">
                       <h4 className="font-medium text-gray-800">Cost</h4>
                       {!isEquipmentDeleted() && (
@@ -291,7 +287,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                       <p className="text-gray-700">Rs: {parseFloat(schedule.maintenanceCost).toFixed(2)}</p>
                     </div>
                     
-                    {/* Technician Section - Hide edit button if equipment is deleted */}
+                    {/* Technician Section*/}
                     <div className="flex justify-between items-center">
                       <h4 className="font-medium text-gray-800">Technician</h4>
                       {!isEquipmentDeleted() && (
@@ -317,7 +313,7 @@ const ExpandableTableRow = ({ schedule, onDelete, onEdit, children, equipmentDat
                       </div>
                     </div>
                     
-                    {/* Description Section - Hide edit button if equipment is deleted */}
+                    {/* Description Section*/}
                     <div className="flex justify-between items-center">
                       <h4 className="font-medium text-gray-800">Description</h4>
                       {!isEquipmentDeleted() && (
