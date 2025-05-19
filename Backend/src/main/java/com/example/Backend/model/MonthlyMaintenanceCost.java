@@ -11,10 +11,10 @@ public class MonthlyMaintenanceCost {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "month", nullable = false)
+    @Column(nullable = false)
     private Date month;
 
-    @Column(name = "total_cost", nullable = false)
+    @Column(nullable = false)
     private Double totalCost;
 
     public MonthlyMaintenanceCost() {}

@@ -25,10 +25,15 @@ public class EquipmentController {
         return equipmentService.getAllEquipment();
     }
 
+    @GetMapping("/get-all")
+    public List<Equipment> getAll() {
+        return equipmentService.getAllDeletedEquipment();
+    }
+
     @PostMapping
-    public void AddEquipment(@RequestBody Equipment equipment) {
-        equipmentService.addEquipment(equipment);
-}
+    public Equipment AddEquipment(@RequestBody Equipment equipment) {
+        return equipmentService.addEquipment(equipment);
+    }
 
     @DeleteMapping("/{id}")
     public void deleteEquipment(@PathVariable Long id) {
@@ -50,8 +55,8 @@ public class EquipmentController {
     }
 
     @GetMapping("/search")
-    public List<Equipment> searchEquipment(@RequestParam String Search) {
-        return equipmentService.searchEquipment(Search);
+    public List<Equipment> searchEquipmentIdOrName(@RequestParam String Search) {
+        return equipmentService.searchEquipmentIdOrName(Search);
     }
 
     @PutMapping("/{id}/Maintenance")
