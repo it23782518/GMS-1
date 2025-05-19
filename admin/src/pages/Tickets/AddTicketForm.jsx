@@ -15,7 +15,7 @@ const AddTicketFormPage = () => {
     description: '',
     priority: 'MEDIUM',
     staffId: '',
-    userId: '',
+    memberId: '',
     assigneeType: 'STAFF'
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,8 +32,8 @@ const AddTicketFormPage = () => {
         ...ticketData,
         staffId: ticketData.assigneeType === 'STAFF' && ticketData.staffId ? 
                  parseInt(ticketData.staffId, 10) : null,
-        userId: ticketData.assigneeType === 'USER' && ticketData.userId ? 
-                parseInt(ticketData.userId, 10) : null,
+        memberId: ticketData.assigneeType === 'MEMBER' && ticketData.memberId ? 
+                parseInt(ticketData.memberId, 10) : null,
         assigneeType: ticketData.assigneeType
       };
       
@@ -44,7 +44,7 @@ const AddTicketFormPage = () => {
         description: '', 
         priority: 'MEDIUM', 
         staffId: '',
-        userId: '',
+        memberId: '',
         assigneeType: 'STAFF' 
       });
       

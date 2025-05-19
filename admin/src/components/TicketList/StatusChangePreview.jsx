@@ -4,7 +4,6 @@ const StatusChangePreview = ({ currentStatus }) => {
   const statusSteps = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'];
   const currentIndex = statusSteps.indexOf(currentStatus);
   
-  // Special UI for CLOSED status
   if (currentStatus === 'CLOSED') {
     return (
       <div className="mt-2">
@@ -28,7 +27,6 @@ const StatusChangePreview = ({ currentStatus }) => {
     );
   }
 
-  // Regular status flow UI for OPEN, IN_PROGRESS, RESOLVED
   return (
     <div className="mt-2">
       <div className="relative pt-1">

@@ -13,7 +13,7 @@ const TicketDetailsForm = ({ ticketData, setTicketData, isSubmitting }) => {
       <div className="space-y-4 sm:space-y-5">
         <div className="space-y-1.5 sm:space-y-2">
           <label htmlFor="assignee" className="block text-xs sm:text-sm font-medium text-gray-700 flex items-center">
-            Assign by
+            Raise by
             <span className="ml-1 sm:ml-2 text-xs text-gray-400 font-normal">(Optional)</span>
           </label>
           
@@ -36,17 +36,17 @@ const TicketDetailsForm = ({ ticketData, setTicketData, isSubmitting }) => {
               </div>
               <div className="flex items-center">
                 <input
-                  id="assignUser"
+                  id="assignMember"
                   name="assigneeType"
                   type="radio"
-                  value="USER"
-                  checked={ticketData.assigneeType === 'USER'}
+                  value="MEMBER"
+                  checked={ticketData.assigneeType === 'MEMBER'}
                   onChange={(e) => setTicketData({ ...ticketData, assigneeType: e.target.value })}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                   disabled={isSubmitting}
                 />
-                <label htmlFor="assignUser" className="ml-2 block text-sm text-gray-700">
-                  User
+                <label htmlFor="assignMember" className="ml-2 block text-sm text-gray-700">
+                  Member
                 </label>
               </div>
             </div>
@@ -63,7 +63,7 @@ const TicketDetailsForm = ({ ticketData, setTicketData, isSubmitting }) => {
                 id="staffId"
                 name="staffId"
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block transition-all duration-200 shadow-sm hover:border-gray-400"
-                type="number"
+                type="text"
                 placeholder="Enter staff ID (e.g., 2)"
                 value={ticketData.staffId}
                 onChange={(e) => setTicketData({ ...ticketData, staffId: e.target.value })}
@@ -71,18 +71,18 @@ const TicketDetailsForm = ({ ticketData, setTicketData, isSubmitting }) => {
               />
             ) : (
               <input
-                id="userId"
-                name="userId"
+                id="memberId"
+                name="memberId"
                 className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 bg-white border border-gray-300 text-gray-900 text-xs sm:text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block transition-all duration-200 shadow-sm hover:border-gray-400"
                 type="number"
-                placeholder="Enter user ID (e.g., 5)"
-                value={ticketData.userId}
-                onChange={(e) => setTicketData({ ...ticketData, userId: e.target.value })}
+                placeholder="Enter member ID (e.g., 5)"
+                value={ticketData.memberId}
+                onChange={(e) => setTicketData({ ...ticketData, memberId: e.target.value })}
                 disabled={isSubmitting}
               />
             )}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Leave empty if unassigned. {ticketData.assigneeType === 'STAFF' ? 'Staff' : 'User'} will be responsible for this ticket.</p>
+          <p className="text-xs text-gray-500 mt-1">Leave empty if unassigned. {ticketData.assigneeType === 'STAFF' ? 'Staff' : 'member'} will be responsible for this ticket.</p>
         </div>
         
         <div className="space-y-1.5 sm:space-y-2">

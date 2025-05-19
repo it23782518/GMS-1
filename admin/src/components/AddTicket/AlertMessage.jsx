@@ -18,7 +18,7 @@ const AlertMessage = ({ type, message }) => {
       </div>
       <div>
         <h3 className="font-medium">{isError ? 'Error' : 'Success'}</h3>
-        <p className="text-xs sm:text-sm text-red-600">{message}</p>
+        <p className="text-xs sm:text-sm text-black-600">{message}</p>
       </div>
     </div>
   );

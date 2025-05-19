@@ -17,7 +17,7 @@ public class TicketResponse {
     private Long raisedById;
     private String raisedByType;
     private String assignedToName;
-    private Long assignedToId;
+    private String assignedToId;
 
     public Long getId() {
         return id;
@@ -85,10 +85,10 @@ public class TicketResponse {
     public void setAssignedToName(String assignedToName) {
         this.assignedToName = assignedToName;
     }
-    public Long getAssignedToId() {
+    public String getAssignedToId() {
         return assignedToId;
     }
-    public void setAssignedToId(Long assignedToId) {
+    public void setAssignedToId(String assignedToId) {
         this.assignedToId = assignedToId;
     }
 }

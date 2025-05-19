@@ -1,7 +1,6 @@
 import React from 'react';
 
 const StatusBadge = ({ status }) => {
-  // Default status to handle undefined/null cases
   const safeStatus = status || 'UNKNOWN';
   
   const styles = {
