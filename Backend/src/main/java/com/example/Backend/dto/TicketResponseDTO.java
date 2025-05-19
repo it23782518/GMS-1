@@ -5,7 +5,7 @@ import com.example.Backend.model.Ticket.TicketStatus;
 
 import java.time.LocalDateTime;
 
-public class TicketResponse {
+public class TicketResponseDTO {
     private Long id;
     private String type;
     private String description;

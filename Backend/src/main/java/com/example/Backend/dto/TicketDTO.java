@@ -9,8 +9,8 @@ public class TicketDTO {
     private String description;
     private TicketStatus status;
     private TicketPriority priority;
-    private Long userId;
-    private Long staffId;
+    private Long memberId;
+    private String staffId;
 
     public TicketDTO() {}
 
@@ -43,16 +43,17 @@ public class TicketDTO {
     }
     public void setPriority(TicketPriority priority) {
         this.priority = priority; }
-    public Long getUserId() {
-        return userId;
+    public Long getMemberId() {
+        return memberId;
     }
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setMemberId(Long memberId) {
+        this.memberId = memberId;
     }
-    public Long getStaffId() {
+    public String getStaffId() {
         return staffId;
     }
-    public void setStaffId(Long staffId) {
+    public void setStaffId(String staffId) {
         this.staffId = staffId;
     }
+
 }

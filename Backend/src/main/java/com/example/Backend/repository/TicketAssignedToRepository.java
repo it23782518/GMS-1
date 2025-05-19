@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TicketAssignedToRepository extends JpaRepository<TicketAssignedTo, Long> {
-    List<TicketAssignedTo> findByStaffId(Long staffId);
+    List<TicketAssignedTo> findByStaffNIC(String staffNIC);
 }

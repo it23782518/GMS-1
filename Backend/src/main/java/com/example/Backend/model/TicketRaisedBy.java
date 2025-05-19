@@ -16,8 +16,8 @@ public class TicketRaisedBy {
     private Ticket ticket;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "id")
+    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "staff_id")
@@ -36,12 +36,12 @@ public class TicketRaisedBy {
         this.ticketId = ticketId;
     }
 
-    public User getUser() {
-        return user;
+    public Member getMember() {
+        return member;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public Staff getStaff() {

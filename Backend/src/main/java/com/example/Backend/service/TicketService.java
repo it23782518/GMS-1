@@ -1,7 +1,7 @@
 package com.example.Backend.service;
 
 import com.example.Backend.dto.TicketDTO;
-import com.example.Backend.dto.TicketResponse;
+import com.example.Backend.dto.TicketResponseDTO;
 import com.example.Backend.model.*;
 import com.example.Backend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -20,7 +20,7 @@ public class TicketService {
     private TicketRepository ticketRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private MemberRepository memberRepository;
 
     @Autowired
     private StaffRepository staffRepository;
@@ -32,12 +32,12 @@ public class TicketService {
     private TicketAssignedToRepository ticketAssignedToRepository;
 
     @Transactional
-    public Ticket createTicket(TicketDTO ticketDTO) {
-        if (ticketDTO.getUserId() != null && ticketDTO.getStaffId() != null) {
-            throw new RuntimeException("Ticket can be raised by either a user or staff, not both");
+    public void createTicket(TicketDTO ticketDTO) {
+        if (ticketDTO.getMemberId() != null && ticketDTO.getStaffId() != null) {
+            throw new RuntimeException("Ticket can be raised by either a Member or staff, not both");
         }
-        if (ticketDTO.getUserId() == null && ticketDTO.getStaffId() == null) {
-            throw new RuntimeException("Ticket must be raised by either a user or staff");
+        if (ticketDTO.getMemberId() == null && ticketDTO.getStaffId() == null) {
+            throw new RuntimeException("Ticket must be raised by either a Member or staff");
         }
 
         Ticket ticket = new Ticket();
@@ -51,22 +51,20 @@ public class TicketService {
         raisedBy.setTicketId(ticket.getId());
         raisedBy.setTicket(ticket);
 
-        if (ticketDTO.getUserId() != null) {
-            User user = userRepository.findById(ticketDTO.getUserId()).orElseThrow(() -> new RuntimeException("User not found"));
-            raisedBy.setUser(user);
+        if (ticketDTO.getMemberId() != null) {
+            Member member = memberRepository.findById(ticketDTO.getMemberId()).orElseThrow(() -> new RuntimeException("Member not found"));
+            raisedBy.setMember(member);
         } else if (ticketDTO.getStaffId() != null) {
             Staff staff = staffRepository.findById(ticketDTO.getStaffId()).orElseThrow(() -> new RuntimeException("Staff not found"));
             raisedBy.setStaff(staff);
         }
 
         ticketRaisedByRepository.saveAndFlush(raisedBy);
-        return ticket;
     }
 
     @Transactional
-    public Ticket assignTicket(Long ticketId, Long staffId) {
+    public void assignTicket(Long ticketId, String staffId) {
         Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found"));
-
         Staff staff = staffRepository.findById(staffId).orElseThrow(() -> new RuntimeException("Staff not found"));
 
         TicketAssignedTo assignedTo = ticketAssignedToRepository.findById(ticketId).orElse(new TicketAssignedTo());
@@ -78,26 +76,25 @@ public class TicketService {
 
         ticket.setStatus(Ticket.TicketStatus.IN_PROGRESS);
         ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.saveAndFlush(ticket);
+        ticketRepository.saveAndFlush(ticket);
     }
 
     @Transactional
-    public Ticket updateTicketStatus(Long ticketId, Ticket.TicketStatus status) {
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found"));
+    public void updateTicketStatus(Long ticketId, String status) {
+        Optional<Ticket> ticket = ticketRepository.findById(ticketId);
 
-        ticket.setStatus(status);
-        ticket.setUpdatedAt(LocalDateTime.now());
-        return ticketRepository.saveAndFlush(ticket);
+        if(ticket.isPresent()) {
+            Ticket t = ticket.get();
+            Ticket.TicketStatus ticketStatus = Ticket.TicketStatus.valueOf(status.toUpperCase());
+            t.setStatus(ticketStatus);
+            t.setUpdatedAt(LocalDateTime.now());
+            ticketRepository.save(t);
+        }
     }
 
-    public List<Ticket> getAllTicketsWithDetails() {
-        return ticketRepository.findAll();
-    }
+    private TicketResponseDTO TicketResponseDTOAssign(Ticket ticket) {
+        TicketResponseDTO response = new TicketResponseDTO();
 
-    public TicketResponse getTicketDetails(Long ticketId) {
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found"));
-
-        TicketResponse response = new TicketResponse();
         response.setId(ticket.getId());
         response.setType(ticket.getType());
         response.setDescription(ticket.getDescription());
@@ -106,61 +103,71 @@ public class TicketService {
         response.setCreatedAt(ticket.getCreatedAt());
         response.setUpdatedAt(ticket.getUpdatedAt());
 
-        Optional<TicketRaisedBy> raisedByOpt = ticketRaisedByRepository.findById(ticketId);
-        raisedByOpt.ifPresent(raisedBy -> {
-            if (raisedBy.getUser() != null) {
-                response.setRaisedById(raisedBy.getUser().getId());
-                response.setRaisedByName(raisedBy.getUser().getName());
-                response.setRaisedByType("USER");
-            } else if (raisedBy.getStaff() != null) {
-                response.setRaisedById(raisedBy.getStaff().getId());
-                response.setRaisedByName(raisedBy.getStaff().getName());
-                response.setRaisedByType("STAFF");
-            }
-        });
-
-        Optional<TicketAssignedTo> assignedToOpt = ticketAssignedToRepository.findById(ticketId);
+        Optional<TicketAssignedTo> assignedToOpt = ticketAssignedToRepository.findById(ticket.getId());
         assignedToOpt.ifPresent(assignedTo -> {
-            response.setAssignedToId(assignedTo.getStaff().getId());
+            response.setAssignedToId(assignedTo.getStaff().getNIC());
             response.setAssignedToName(assignedTo.getStaff().getName());
         });
 
         return response;
     }
 
-    public List<TicketResponse> getTickets(Long ticketId) {
-        if (ticketId != null) {
-            TicketResponse ticket = getTicketDetails(ticketId);
-            return List.of(ticket);
+    public List<TicketResponseDTO> getAllTicketsWithDetails() {
+        List<Ticket> tickets = ticketRepository.findAll();
+        List<TicketResponseDTO> responseList = new ArrayList<>();
+
+        for (Ticket ticket : tickets) {
+            TicketResponseDTO response = TicketResponseDTOAssign(ticket);
+
+            responseList.add(response);
         }
-        return ticketRepository.findAll().stream()
-                .map(ticket -> getTicketDetails(ticket.getId()))
-                .collect(Collectors.toList());
+
+        return responseList;
     }
 
-    public List<TicketRaisedBy> getTicketsRaisedByUser(Long userId) {
-        return ticketRaisedByRepository.findByUserId(userId);
+    public TicketResponseDTO getTicketDetails(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new RuntimeException("Ticket not found"));
+
+        return TicketResponseDTOAssign(ticket);
     }
 
-    public List<TicketRaisedBy> getTicketsRaisedByStaff(Long staffId) {
-        return ticketRaisedByRepository.findByStaffId(staffId);
+
+    public List<TicketRaisedBy> getTicketsRaisedByMember(Long memberId) {
+        return ticketRaisedByRepository.findByMemberId(memberId);
     }
 
-    public List<TicketAssignedTo> getTicketsAssignedToStaff(Long staffId) {
-        return ticketAssignedToRepository.findByStaffId(staffId);
+    public List<TicketRaisedBy> getTicketsRaisedByStaff(String staffId) {
+        return ticketRaisedByRepository.findByStaffNIC(staffId);
     }
 
-    public List<Ticket> filterTicketsByStatus(Ticket.TicketStatus status) {
-        if (status == null) {
-            return ticketRepository.findAll();
+    public List<TicketAssignedTo> getTicketsAssignedToStaff(String staffId) {
+        return ticketAssignedToRepository.findByStaffNIC(staffId);
+    }
+
+    public List<Ticket> filterTicketsByStatus(String status) {
+        try {
+            Ticket.TicketStatus ticketStatus = Ticket.TicketStatus.valueOf(status.toUpperCase());
+            return ticketRepository.findByStatus(ticketStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status value: " + status);
         }
-        return ticketRepository.findByStatus(status);
     }
 
-    public List<Ticket> filterTicketsByPriority(Ticket.TicketPriority priority) {
-        if (priority == null) {
-            return ticketRepository.findAll();
+    public List<Ticket> filterTicketsByPriority(String priority) {
+        try {
+            Ticket.TicketPriority ticketPriority = Ticket.TicketPriority.valueOf(priority.toUpperCase());
+            return ticketRepository.findByPriority(ticketPriority);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status value: " + priority);
         }
-        return ticketRepository.findByPriority(priority);
+    }
+
+    public int countTicketsByStatus(String status) {
+        try {
+            Ticket.TicketStatus ticketStatus = Ticket.TicketStatus.valueOf(status.toUpperCase());
+            return ticketRepository.findByStatus(ticketStatus).size();
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status value: " + status);
+        }
     }
 }
