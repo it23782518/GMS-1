@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+
+=======
 CREATE DATABASE gms;
 USE gms;
 drop database gms;
@@ -262,3 +265,4 @@ FROM tickets t
 WHERE t.status = 'OPEN'
 AND t.created_at < (NOW() - INTERVAL 7 DAY)
 ORDER BY days_open DESC;
+>>>>>>> q
